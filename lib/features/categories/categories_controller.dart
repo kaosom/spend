@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import '../../core/errors/app_error.dart';
 import '../../models/models.dart';
+import '../../core/storage/storage_service.dart';
 
 /// Controller for managing categories
 class CategoriesController extends GetxController {
@@ -22,9 +23,16 @@ class CategoriesController extends GetxController {
   /// Load categories from storage
   Future<void> loadCategories() async {
     try {
-      // Initialize with preset categories if empty
+      // Initialize from storage or with preset categories if empty
+      final result = await StorageService.retrieve('categories_data');
+      if (result.isSuccess && result.data != null) {
+        final data = result.data!['categories'] as List;
+        _categories.value = data.map((e) => Category.fromJson(e)).toList();
+      }
+
       if (_categories.isEmpty) {
         _categories.value = PresetCategories.all;
+        await saveCategories();
       }
       clearError();
     } catch (e) {
@@ -40,7 +48,8 @@ class CategoriesController extends GetxController {
   /// Save categories to storage
   Future<void> saveCategories() async {
     try {
-      // TODO: Implement storage saving
+      final data = {'categories': _categories.map((c) => c.toJson()).toList()};
+      await StorageService.store('categories_data', data);
       clearError();
     } catch (e) {
       setError(

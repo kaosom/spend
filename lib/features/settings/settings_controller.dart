@@ -3,6 +3,7 @@ import '../../core/errors/app_error.dart';
 import '../../core/utils/debounce.dart';
 import '../../models/models.dart';
 import '../tracking/tracking_controller.dart';
+import '../../core/storage/storage_service.dart';
 
 /// Controller for app settings
 class SettingsController extends GetxController {
@@ -33,8 +34,12 @@ class SettingsController extends GetxController {
   /// Load settings from storage
   Future<void> loadSettings() async {
     try {
-      // TODO: Implement storage loading
-      _settings.value = AppSettings.defaults();
+      final result = await StorageService.retrieve('settings_data');
+      if (result.isSuccess && result.data != null) {
+        _settings.value = AppSettings.fromJson(result.data!);
+      } else {
+        _settings.value = AppSettings.defaults();
+      }
       clearError();
     } catch (e) {
       setError(
@@ -61,7 +66,8 @@ class SettingsController extends GetxController {
 
   /// Save to storage (internal method)
   Future<void> _saveToStorage() async {
-    // TODO: Implement storage saving
+    final data = _settings.value.toJson();
+    await StorageService.store('settings_data', data);
   }
 
   /// Update settings

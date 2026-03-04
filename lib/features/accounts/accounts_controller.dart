@@ -3,6 +3,7 @@ import '../../core/errors/app_error.dart';
 import '../../models/models.dart';
 import '../settings/settings_controller.dart';
 import '../../core/constants/constants.dart';
+import '../../core/storage/storage_service.dart';
 
 /// Controller for managing accounts
 class AccountsController extends GetxController {
@@ -40,9 +41,12 @@ class AccountsController extends GetxController {
   /// Load accounts from storage
   Future<void> loadAccounts() async {
     try {
-      // TODO: Implement storage loading
-      // For now, initialize with empty list
-      _accounts.clear();
+      final result = await StorageService.retrieve('accounts_data');
+      if (result.isSuccess && result.data != null) {
+        final data = result.data!['accounts'] as List;
+        _accounts.value = data.map((e) => Account.fromJson(e)).toList();
+      }
+
       if (_accounts.isEmpty) {
         _accounts.add(
           Account.create(
@@ -51,6 +55,7 @@ class AccountsController extends GetxController {
             colorPreset: 'green',
           ),
         );
+        await saveAccounts();
       }
       clearError();
     } catch (e) {
@@ -63,7 +68,8 @@ class AccountsController extends GetxController {
   /// Save accounts to storage
   Future<void> saveAccounts() async {
     try {
-      // TODO: Implement storage saving
+      final data = {'accounts': _accounts.map((e) => e.toJson()).toList()};
+      await StorageService.store('accounts_data', data);
       clearError();
     } catch (e) {
       setError(

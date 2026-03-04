@@ -3,6 +3,7 @@ import '../../core/errors/app_error.dart';
 import '../../core/utils/debounce.dart';
 import '../../core/utils/dates.dart';
 import '../../models/models.dart';
+import '../../core/storage/storage_service.dart';
 
 /// Controller for managing transactions
 class TransactionsController extends GetxController {
@@ -33,10 +34,35 @@ class TransactionsController extends GetxController {
   /// Load transactions from storage
   Future<void> loadTransactions() async {
     try {
-      // TODO: Implement storage loading
-      _transactions.clear();
-      _recurrenceRules.clear();
-      _plannedSpends.clear();
+      final result = await StorageService.retrieve('transactions_data');
+      if (result.isSuccess && result.data != null) {
+        final data = result.data!;
+
+        final tData = data['transactions'] as List?;
+        if (tData != null) {
+          _transactions.value = tData
+              .map((e) => Transaction.fromJson(e))
+              .toList();
+        }
+
+        final rData = data['recurrenceRules'] as List?;
+        if (rData != null) {
+          _recurrenceRules.value = rData
+              .map((e) => RecurrenceRule.fromJson(e))
+              .toList();
+        }
+
+        final pData = data['plannedSpends'] as List?;
+        if (pData != null) {
+          _plannedSpends.value = pData
+              .map((e) => PlannedSpend.fromJson(e))
+              .toList();
+        }
+      } else {
+        _transactions.clear();
+        _recurrenceRules.clear();
+        _plannedSpends.clear();
+      }
       clearError();
     } catch (e) {
       setError(
@@ -66,7 +92,12 @@ class TransactionsController extends GetxController {
 
   /// Save to storage (internal method)
   Future<void> _saveToStorage() async {
-    // TODO: Implement storage saving
+    final data = {
+      'transactions': _transactions.map((e) => e.toJson()).toList(),
+      'recurrenceRules': _recurrenceRules.map((e) => e.toJson()).toList(),
+      'plannedSpends': _plannedSpends.map((e) => e.toJson()).toList(),
+    };
+    await StorageService.store('transactions_data', data);
   }
 
   /// Create a new transaction
