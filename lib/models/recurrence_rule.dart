@@ -41,6 +41,14 @@ class RecurrenceRule extends Equatable {
     );
   }
 
+  /// Create daily recurrence
+  factory RecurrenceRule.daily() {
+    return RecurrenceRule.create(
+      pattern: AppConstants.recurrenceDaily,
+      interval: 1,
+    );
+  }
+
   /// Create weekly recurrence
   factory RecurrenceRule.weekly() {
     return RecurrenceRule.create(
@@ -53,6 +61,14 @@ class RecurrenceRule extends Equatable {
   factory RecurrenceRule.biweekly() {
     return RecurrenceRule.create(
       pattern: AppConstants.recurrenceBiweekly,
+      interval: 1,
+    );
+  }
+
+  /// Create monthly recurrence
+  factory RecurrenceRule.monthly() {
+    return RecurrenceRule.create(
+      pattern: AppConstants.recurrenceMonthly,
       interval: 1,
     );
   }
@@ -130,8 +146,10 @@ class RecurrenceRule extends Equatable {
 
   bool _isValidPattern(String pattern) {
     return [
+      AppConstants.recurrenceDaily,
       AppConstants.recurrenceWeekly,
       AppConstants.recurrenceBiweekly,
+      AppConstants.recurrenceMonthly,
       AppConstants.recurrenceCustom,
     ].contains(pattern);
   }
@@ -158,10 +176,14 @@ class RecurrenceRule extends Equatable {
     if (hasEnded(afterDate)) return null;
 
     switch (pattern) {
+      case AppConstants.recurrenceDaily:
+        return _getNextDailyOccurrence(afterDate);
       case AppConstants.recurrenceWeekly:
         return _getNextWeeklyOccurrence(afterDate);
       case AppConstants.recurrenceBiweekly:
         return _getNextBiweeklyOccurrence(afterDate);
+      case AppConstants.recurrenceMonthly:
+        return _getNextMonthlyOccurrence(afterDate);
       case AppConstants.recurrenceCustom:
         return _getNextCustomOccurrence(afterDate);
       default:
@@ -169,17 +191,43 @@ class RecurrenceRule extends Equatable {
     }
   }
 
+  DateTime _getNextDailyOccurrence(DateTime afterDate) {
+    return afterDate.add(const Duration(days: 1));
+  }
+
   DateTime _getNextWeeklyOccurrence(DateTime afterDate) {
-    final daysUntilNext = 7 - afterDate.weekday + 1; // Next Sunday
-    return afterDate.add(
-      Duration(days: daysUntilNext == 7 ? 7 : daysUntilNext),
-    );
+    return afterDate.add(const Duration(days: 7));
   }
 
   DateTime _getNextBiweeklyOccurrence(DateTime afterDate) {
-    // This is a simplified implementation - in a real app you'd track the original start date
-    // For now, just add 14 days
     return afterDate.add(const Duration(days: 14));
+  }
+
+  DateTime _getNextMonthlyOccurrence(DateTime afterDate) {
+    int nextMonth = afterDate.month + 1;
+    int nextYear = afterDate.year;
+
+    if (nextMonth > 12) {
+      nextMonth = 1;
+      nextYear++;
+    }
+
+    int daysInNextMonth = DateTime(nextYear, nextMonth + 1, 0).day;
+    int nextDay = afterDate.day;
+
+    // Si el día de origen es mayor a los días que tiene el mes destino (ej. 31 de Ene a Feb)
+    if (nextDay > daysInNextMonth) {
+      nextDay = daysInNextMonth;
+    }
+
+    return DateTime(
+      nextYear,
+      nextMonth,
+      nextDay,
+      afterDate.hour,
+      afterDate.minute,
+      afterDate.second,
+    );
   }
 
   DateTime _getNextCustomOccurrence(DateTime afterDate) {
@@ -207,14 +255,18 @@ class RecurrenceRule extends Equatable {
   /// Get display text for the recurrence pattern
   String get displayText {
     switch (pattern) {
+      case AppConstants.recurrenceDaily:
+        return 'Diario';
       case AppConstants.recurrenceWeekly:
-        return 'Weekly';
+        return 'Semanal';
       case AppConstants.recurrenceBiweekly:
-        return 'Bi-weekly';
+        return 'Quincenal';
+      case AppConstants.recurrenceMonthly:
+        return 'Mensual';
       case AppConstants.recurrenceCustom:
-        return 'Every $interval days';
+        return 'Cada $interval días';
       default:
-        return 'Unknown';
+        return 'Desconocido';
     }
   }
 

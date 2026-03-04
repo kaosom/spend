@@ -185,19 +185,80 @@ class TransactionsController extends GetxController {
     }
   }
 
-  /// Get transactions for a specific account
+  /// Get transactions for a specific account (All Time)
   List<Transaction> getTransactionsForAccount(String accountId) {
-    return _transactions.where((t) => t.accountId == accountId).toList();
+    // Para simplificar, obtenemos desde el año 2000 hasta 5 años en el futuro.
+    // Esto asegura que veamos ocurrencias generadas en las vistas que simplemente enlisten "todo"
+    final startDate = DateTime(2000);
+    final endDate = DateTime.now().add(const Duration(days: 365 * 5));
+
+    return getTransactionsInRange(
+      startDate,
+      endDate,
+    ).where((t) => t.accountId == accountId).toList();
   }
 
-  /// Get transactions for a specific date range
+  /// Get transactions for a specific date range, projecting recurrences
   List<Transaction> getTransactionsInRange(
     DateTime startDate,
     DateTime endDate,
   ) {
-    return _transactions.where((t) {
-      return !t.date.isBefore(startDate) && !t.date.isAfter(endDate);
-    }).toList();
+    final List<Transaction> results = [];
+
+    for (final t in _transactions) {
+      // Si la transacción NO es recurrente, simplemente la añadimos si cae en el rango
+      if (t.recurrenceRuleId == null) {
+        if (!t.date.isBefore(startDate) && !t.date.isAfter(endDate)) {
+          results.add(t);
+        }
+      } else {
+        // Si ES recurrente, buscamos la regla
+        final rule = getRecurrenceRuleById(t.recurrenceRuleId!);
+        if (rule == null) {
+          // Fallback: si se borró la regla, comportarse como normal
+          if (!t.date.isBefore(startDate) && !t.date.isAfter(endDate)) {
+            results.add(t);
+          }
+          continue;
+        }
+
+        // Si la "madre" cae en el rango, la añadimos.
+        if (!t.date.isBefore(startDate) && !t.date.isAfter(endDate)) {
+          results.add(t);
+        }
+
+        // Proyectamos futuras repeticiones
+        // (Las calculamos desde la fecha de la transacción base hasta el endDate solicitado)
+        final DateTime calculationStart = startDate.isBefore(t.date)
+            ? t.date
+            : startDate;
+
+        DateTime? nextDate = rule.getNextOccurrence(t.date);
+        int occurrenceCount = 1; // La primera es la base (ya contemplada)
+
+        while (nextDate != null && !nextDate.isAfter(endDate)) {
+          // Si la regla expiró por cuenta límite o fecha final.
+          if (rule.hasEnded(nextDate)) break;
+          // Comprobar límite de ocurrencias numéricas (si existe)
+          if (rule.occurrencesLeft != null &&
+              occurrenceCount > rule.occurrencesLeft!)
+            break;
+
+          if (!nextDate.isBefore(calculationStart)) {
+            // Clonamos virtualmente añadiendo el prefijo "virtual_" al ID
+            final virtualTransaction = t.copyWith(
+              id: 'virtual_${t.id}_${nextDate.millisecondsSinceEpoch}',
+              date: nextDate,
+            );
+            results.add(virtualTransaction);
+          }
+          nextDate = rule.getNextOccurrence(nextDate);
+          occurrenceCount++;
+        }
+      }
+    }
+
+    return results;
   }
 
   /// Get daily totals for a date range

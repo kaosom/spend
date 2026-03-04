@@ -60,8 +60,10 @@ class AppConstants {
   static const double defaultSafetyBuffer = 1000.0; // MXN
 
   // Recurrence patterns
+  static const String recurrenceDaily = 'daily';
   static const String recurrenceWeekly = 'weekly';
   static const String recurrenceBiweekly = 'biweekly';
+  static const String recurrenceMonthly = 'monthly';
   static const String recurrenceCustom = 'custom';
 
   // Account types

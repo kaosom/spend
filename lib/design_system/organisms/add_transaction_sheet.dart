@@ -37,6 +37,9 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   late DateTime _selectedDate;
   bool _isObligatory = false;
 
+  String? _selectedRecurrence;
+  final _customDaysController = TextEditingController(text: '1');
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +59,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     _amountController.dispose();
     _noteController.dispose();
     _merchantController.dispose();
+    _customDaysController.dispose();
     super.dispose();
   }
 
@@ -120,6 +124,22 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
       return;
     }
 
+    RecurrenceRule? recurrenceRule;
+    if (_selectedRecurrence != null) {
+      if (_selectedRecurrence == AppConstants.recurrenceDaily) {
+        recurrenceRule = RecurrenceRule.daily();
+      } else if (_selectedRecurrence == AppConstants.recurrenceWeekly) {
+        recurrenceRule = RecurrenceRule.weekly();
+      } else if (_selectedRecurrence == AppConstants.recurrenceBiweekly) {
+        recurrenceRule = RecurrenceRule.biweekly();
+      } else if (_selectedRecurrence == AppConstants.recurrenceMonthly) {
+        recurrenceRule = RecurrenceRule.monthly();
+      } else if (_selectedRecurrence == AppConstants.recurrenceCustom) {
+        final customDays = int.tryParse(_customDaysController.text.trim()) ?? 1;
+        recurrenceRule = RecurrenceRule.custom(customDays);
+      }
+    }
+
     final result = await _transactionsController.createTransaction(
       amount: amount,
       date: _selectedDate,
@@ -133,6 +153,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
           ? null
           : _merchantController.text.trim(),
       isObligatory: _isObligatory,
+      recurrenceRule: recurrenceRule,
     );
 
     if (result.isSuccess) {
@@ -475,7 +496,81 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                               activeThumbColor: AvidTokens.accentError,
                             ),
                           ),
-                          const SizedBox(height: AvidTokens.space8),
+                          const SizedBox(height: AvidTokens.space4),
+
+                          // Recurrence selector
+                          Text(
+                            'Repetir (Frecuencia)',
+                            style: AvidTypography.labelLarge(),
+                          ),
+                          const SizedBox(height: AvidTokens.space2),
+                          DropdownButtonFormField<String?>(
+                            value: _selectedRecurrence,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: AvidTokens.backgroundSecondary,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AvidTokens.radiusMedium,
+                                ),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            dropdownColor: AvidTokens.backgroundSecondary,
+                            items: const [
+                              DropdownMenuItem(
+                                value: null,
+                                child: Text("Una sola vez"),
+                              ),
+                              DropdownMenuItem(
+                                value: AppConstants.recurrenceDaily,
+                                child: Text("Diario"),
+                              ),
+                              DropdownMenuItem(
+                                value: AppConstants.recurrenceWeekly,
+                                child: Text("Semanal"),
+                              ),
+                              DropdownMenuItem(
+                                value: AppConstants.recurrenceBiweekly,
+                                child: Text("Quincenal"),
+                              ),
+                              DropdownMenuItem(
+                                value: AppConstants.recurrenceMonthly,
+                                child: Text("Mensual"),
+                              ),
+                              DropdownMenuItem(
+                                value: AppConstants.recurrenceCustom,
+                                child: Text("Personalizado..."),
+                              ),
+                            ],
+                            onChanged: (val) {
+                              setState(() {
+                                _selectedRecurrence = val;
+                              });
+                            },
+                          ),
+
+                          if (_selectedRecurrence ==
+                              AppConstants.recurrenceCustom) ...[
+                            const SizedBox(height: AvidTokens.space3),
+                            TextFormField(
+                              controller: _customDaysController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: 'Cada cuántos días',
+                                filled: true,
+                                fillColor: AvidTokens.backgroundSecondary,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    AvidTokens.radiusMedium,
+                                  ),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+                          ],
+
+                          const SizedBox(height: AvidTokens.space6),
 
                           // Submit button - Futuristic and clean
                           Container(
