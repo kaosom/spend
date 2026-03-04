@@ -180,438 +180,479 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Container(
         decoration: BoxDecoration(
-          gradient: AvidTokens.gradientCard,
+          color: AvidTokens.backgroundPrimary,
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(AvidTokens.radiusExtraLarge),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
-              blurRadius: 30,
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
               spreadRadius: 0,
-              offset: const Offset(0, -10),
+              offset: const Offset(0, -5),
             ),
           ],
         ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AvidTokens.space6),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Handle bar - Modern and clean
-                Center(
-                  child: Container(
-                    width: 48,
-                    height: 5,
-                    margin: const EdgeInsets.only(bottom: AvidTokens.space6),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AvidTokens.borderPrimary,
-                          AvidTokens.borderPrimary.withOpacity(0.5),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(
-                        AvidTokens.radiusRound,
-                      ),
-                    ),
+        // Envuelve todo el contenido en una vista scrolleable que reaccione al teclado
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(
+            top: AvidTokens.space6,
+            left: AvidTokens.space6,
+            right: AvidTokens.space6,
+            bottom: bottomInset > 0
+                ? bottomInset + AvidTokens.space4
+                : AvidTokens.space8,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: AvidTokens.space6),
+                  decoration: BoxDecoration(
+                    color: AvidTokens.borderPrimary,
+                    borderRadius: BorderRadius.circular(AvidTokens.radiusRound),
                   ),
                 ),
+              ),
 
-                // Title
-                Text('Agregar Transacción', style: AvidTypography.heading3()),
-                const SizedBox(height: AvidTokens.space6),
+              // Title
+              Text('Agregar Transacción', style: AvidTypography.heading3()),
+              const SizedBox(height: AvidTokens.space6),
 
-                // Form
-                Form(
-                  key: _formKey,
-                  child: GestureDetector(
-                    onTap: () => FocusScope.of(context).unfocus(),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+              // Form
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Transaction type toggle
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AvidTokens.backgroundSecondary,
+                        borderRadius: BorderRadius.circular(
+                          AvidTokens.radiusMedium,
+                        ),
+                      ),
+                      child: Row(
                         children: [
-                          // Transaction type toggle
-                          Container(
-                            decoration: BoxDecoration(
-                              color: AvidTokens.backgroundSecondary,
-                              borderRadius: BorderRadius.circular(
-                                AvidTokens.radiusMedium,
+                          Expanded(
+                            child: _TypeToggleButton(
+                              label: 'Gasto',
+                              icon: Icons.remove_circle,
+                              isSelected:
+                                  _selectedType ==
+                                  AppConstants.transactionTypeExpense,
+                              color: AvidTokens.accentError,
+                              onTap: () => setState(
+                                () => _selectedType =
+                                    AppConstants.transactionTypeExpense,
                               ),
                             ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: _TypeToggleButton(
-                                    label: 'Gasto',
-                                    icon: Icons.remove_circle_outline,
-                                    isSelected:
-                                        _selectedType ==
-                                        AppConstants.transactionTypeExpense,
-                                    color: AvidTokens.accentError,
-                                    onTap: () => setState(
-                                      () => _selectedType =
-                                          AppConstants.transactionTypeExpense,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _TypeToggleButton(
-                                    label: 'Ingreso',
-                                    icon: Icons.add_circle_outline,
-                                    isSelected:
-                                        _selectedType ==
-                                        AppConstants.transactionTypeIncome,
-                                    color: AvidTokens.accentSuccess,
-                                    onTap: () => setState(
-                                      () => _selectedType =
-                                          AppConstants.transactionTypeIncome,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                          ),
+                          Expanded(
+                            child: _TypeToggleButton(
+                              label: 'Ingreso',
+                              icon: Icons.add_circle,
+                              isSelected:
+                                  _selectedType ==
+                                  AppConstants.transactionTypeIncome,
+                              color: AvidTokens.accentSuccess,
+                              onTap: () => setState(
+                                () => _selectedType =
+                                    AppConstants.transactionTypeIncome,
+                              ),
                             ),
                           ),
-                          const SizedBox(height: AvidTokens.space4),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AvidTokens.space6),
 
-                          // Amount
-                          TextFormField(
-                            controller: _amountController,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            style: AvidTypography.heading3(),
-                            decoration: InputDecoration(
-                              labelText: 'Monto (MXN)',
-                              labelStyle: AvidTypography.bodyMedium(),
-                              hintText: '0.00',
-                              prefixIcon: const Icon(Icons.attach_money),
-                              prefixText: '\$ ',
-                            ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'El monto es obligatorio';
-                              }
-                              final amount = double.tryParse(value.trim());
-                              if (amount == null || amount <= 0) {
-                                return 'Ingresa un monto válido';
-                              }
-                              if (amount > AppConstants.maxAmount) {
-                                return 'Monto demasiado alto';
-                              }
-                              return null;
-                            },
+                    // Amount (minimalist, huge text)
+                    TextFormField(
+                      controller: _amountController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      style: AvidTypography.heading1().copyWith(fontSize: 48),
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        filled: false,
+                        hintText: '0.00',
+                        hintStyle: AvidTypography.heading1().copyWith(
+                          fontSize: 48,
+                          color: AvidTokens.textTertiary,
+                        ),
+                        prefixText: '\$ ',
+                        prefixStyle: AvidTypography.heading2().copyWith(
+                          color: AvidTokens.textSecondary,
+                        ),
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty)
+                          return 'El monto es obligatorio';
+                        final amount = double.tryParse(value.trim());
+                        if (amount == null || amount <= 0)
+                          return 'Ingresa un monto válido';
+                        if (amount > AppConstants.maxAmount)
+                          return 'Monto demasiado alto';
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: AvidTokens.space6),
+
+                    // Category selector (cleaner)
+                    Obx(() {
+                      final categories = _categoriesController.activeCategories;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Categoría',
+                            style: AvidTypography.labelMedium(),
                           ),
-                          const SizedBox(height: AvidTokens.space4),
-
-                          // Category selector
-                          Obx(() {
-                            final categories =
-                                _categoriesController.activeCategories;
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Category',
-                                  style: AvidTypography.labelLarge(),
-                                ),
-                                const SizedBox(height: AvidTokens.space2),
-                                SizedBox(
-                                  height: 50,
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount: categories.length,
-                                    itemBuilder: (context, index) {
-                                      final category = categories[index];
-                                      final isSelected =
-                                          _selectedCategory?.id == category.id;
-                                      final colorValue = Color(
-                                        int.parse(
-                                          category.displayColor.replaceFirst(
-                                            '#',
-                                            '0xFF',
-                                          ),
+                          const SizedBox(height: AvidTokens.space3),
+                          SizedBox(
+                            height: 48,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: categories.length,
+                              itemBuilder: (context, index) {
+                                final category = categories[index];
+                                final isSelected =
+                                    _selectedCategory?.id == category.id;
+                                final colorValue = Color(
+                                  int.parse(
+                                    category.displayColor.replaceFirst(
+                                      '#',
+                                      '0xFF',
+                                    ),
+                                  ),
+                                );
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: AvidTokens.space3,
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () => setState(
+                                      () => _selectedCategory = category,
+                                    ),
+                                    child: AnimatedContainer(
+                                      duration: AppConstants.animationFast,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: AvidTokens.space4,
+                                        vertical: AvidTokens.space2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: isSelected
+                                            ? colorValue
+                                            : AvidTokens.backgroundSecondary,
+                                        borderRadius: BorderRadius.circular(
+                                          AvidTokens.radiusRound,
                                         ),
-                                      );
-                                      return Padding(
-                                        padding: const EdgeInsets.only(
-                                          right: AvidTokens.space2,
-                                        ),
-                                        child: GestureDetector(
-                                          onTap: () => setState(
-                                            () => _selectedCategory = category,
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            _getIconData(category.icon),
+                                            color: isSelected
+                                                ? Colors.white
+                                                : AvidTokens.textSecondary,
+                                            size: 18,
                                           ),
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: AvidTokens.space3,
-                                              vertical: AvidTokens.space2,
-                                            ),
-                                            decoration: BoxDecoration(
+                                          const SizedBox(
+                                            width: AvidTokens.space2,
+                                          ),
+                                          Text(
+                                            category.name,
+                                            style: AvidTypography.labelSmall(
                                               color: isSelected
-                                                  ? colorValue
-                                                  : AvidTokens
-                                                        .backgroundSecondary,
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                    AvidTokens.radiusMedium,
-                                                  ),
-                                              border: Border.all(
-                                                color: isSelected
-                                                    ? colorValue
-                                                    : AvidTokens.borderPrimary,
-                                                width: isSelected ? 2 : 1,
-                                              ),
-                                              boxShadow: isSelected
-                                                  ? [
-                                                      BoxShadow(
-                                                        color: colorValue
-                                                            .withOpacity(0.3),
-                                                        blurRadius: 8,
-                                                        spreadRadius: 0,
-                                                      ),
-                                                    ]
-                                                  : null,
-                                            ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(
-                                                  _getIconData(category.icon),
-                                                  color: isSelected
-                                                      ? Colors.white
-                                                      : AvidTokens
-                                                            .textSecondary,
-                                                  size: 18,
-                                                ),
-                                                const SizedBox(
-                                                  width: AvidTokens.space1,
-                                                ),
-                                                Text(
-                                                  category.name,
-                                                  style:
-                                                      AvidTypography.labelSmall(
-                                                        color: isSelected
-                                                            ? Colors.white
-                                                            : AvidTokens
-                                                                  .textSecondary,
-                                                      ),
-                                                ),
-                                              ],
+                                                  ? Colors.white
+                                                  : AvidTokens.textPrimary,
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            );
-                          }),
-                          const SizedBox(height: AvidTokens.space4),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
+                    const SizedBox(height: AvidTokens.space6),
 
-                          // Date selector
-                          GestureDetector(
+                    // Grouped Clean Options (Date & Recurrence)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AvidTokens.backgroundSecondary,
+                        borderRadius: BorderRadius.circular(
+                          AvidTokens.radiusLarge,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          // Date picker row
+                          ListTile(
+                            leading: const Icon(
+                              Icons.calendar_today,
+                              color: AvidTokens.textSecondary,
+                              size: 20,
+                            ),
+                            title: Text(
+                              'Fecha',
+                              style: AvidTypography.bodyMedium(),
+                            ),
+                            trailing: Text(
+                              AppDateUtils.DateUtils.formatDisplayDate(
+                                _selectedDate,
+                              ),
+                              style: AvidTypography.labelMedium(
+                                color: AvidTokens.accentPrimary,
+                              ),
+                            ),
                             onTap: _selectDate,
-                            child: Container(
-                              padding: const EdgeInsets.all(AvidTokens.space4),
-                              decoration: BoxDecoration(
-                                color: AvidTokens.backgroundSecondary,
-                                borderRadius: BorderRadius.circular(
-                                  AvidTokens.radiusMedium,
+                          ),
+                          const Divider(
+                            height: 1,
+                            indent: 48,
+                            color: AvidTokens.borderPrimary,
+                          ),
+
+                          // Recurrence selector row
+                          ListTile(
+                            leading: const Icon(
+                              Icons.repeat,
+                              color: AvidTokens.textSecondary,
+                              size: 22,
+                            ),
+                            title: Text(
+                              'Repetir',
+                              style: AvidTypography.bodyMedium(),
+                            ),
+                            trailing: DropdownButtonHideUnderline(
+                              child: DropdownButton<String?>(
+                                value: _selectedRecurrence,
+                                dropdownColor: AvidTokens.backgroundSecondary,
+                                icon: const Icon(Icons.unfold_more, size: 16),
+                                style: AvidTypography.labelMedium(
+                                  color: AvidTokens.textPrimary,
                                 ),
-                                border: Border.all(
-                                  color: AvidTokens.borderPrimary,
-                                ),
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: null,
+                                    child: Text("Nunca"),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: AppConstants.recurrenceDaily,
+                                    child: Text("Diario"),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: AppConstants.recurrenceWeekly,
+                                    child: Text("Semanal"),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: AppConstants.recurrenceBiweekly,
+                                    child: Text("Quincenal"),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: AppConstants.recurrenceMonthly,
+                                    child: Text("Mensual"),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: AppConstants.recurrenceCustom,
+                                    child: Text("Custom..."),
+                                  ),
+                                ],
+                                onChanged: (val) =>
+                                    setState(() => _selectedRecurrence = val),
+                              ),
+                            ),
+                          ),
+
+                          if (_selectedRecurrence ==
+                              AppConstants.recurrenceCustom) ...[
+                            const Divider(
+                              height: 1,
+                              indent: 48,
+                              color: AvidTokens.borderPrimary,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(
-                                    Icons.calendar_today,
-                                    color: AvidTokens.textSecondary,
-                                  ),
-                                  const SizedBox(width: AvidTokens.space3),
-                                  Text(
-                                    AppDateUtils.DateUtils.formatDisplayDate(
-                                      _selectedDate,
+                                  Expanded(
+                                    child: Text(
+                                      'Cada',
+                                      style: AvidTypography.bodyMedium(),
                                     ),
+                                  ),
+                                  SizedBox(
+                                    width: 60,
+                                    child: TextFormField(
+                                      controller: _customDaysController,
+                                      keyboardType: TextInputType.number,
+                                      textAlign: TextAlign.center,
+                                      decoration: InputDecoration(
+                                        isDense: true,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                              vertical: 8,
+                                            ),
+                                        filled: true,
+                                        fillColor: AvidTokens.backgroundPrimary,
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'días',
                                     style: AvidTypography.bodyMedium(),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                          const SizedBox(height: AvidTokens.space4),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AvidTokens.space6),
 
-                          // Merchant (optional)
-                          TextFormField(
-                            controller: _merchantController,
-                            style: AvidTypography.bodyLarge(),
-                            decoration: InputDecoration(
-                              labelText: 'Comercio (opcional)',
-                              labelStyle: AvidTypography.bodyMedium(),
-                              prefixIcon: const Icon(Icons.store),
-                            ),
-                          ),
-                          const SizedBox(height: AvidTokens.space4),
-
-                          // Note (optional)
-                          TextFormField(
-                            controller: _noteController,
-                            style: AvidTypography.bodyLarge(),
-                            maxLines: 2,
-                            decoration: InputDecoration(
-                              labelText: 'Nota (opcional)',
-                              labelStyle: AvidTypography.bodyMedium(),
-                              prefixIcon: const Icon(Icons.note),
-                            ),
-                          ),
-                          const SizedBox(height: AvidTokens.space4),
-
-                          // Obligatory toggle
+                    // Advanced Options Toggle (Merchant, Note, Obligatory)
+                    Theme(
+                      data: Theme.of(
+                        context,
+                      ).copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        tilePadding: EdgeInsets.zero,
+                        title: Text(
+                          'Opciones Avanzadas',
+                          style: AvidTypography.labelMedium(),
+                        ),
+                        children: [
                           Container(
                             decoration: BoxDecoration(
                               color: AvidTokens.backgroundSecondary,
                               borderRadius: BorderRadius.circular(
-                                AvidTokens.radiusMedium,
-                              ),
-                            ),
-                            child: SwitchListTile(
-                              title: Text(
-                                'Marcar como obligatorio',
-                                style: AvidTypography.bodyMedium(),
-                              ),
-                              subtitle: Text(
-                                'Pago fijo requerido',
-                                style: AvidTypography.bodySmall(),
-                              ),
-                              value: _isObligatory,
-                              onChanged: (value) =>
-                                  setState(() => _isObligatory = value),
-                              activeThumbColor: AvidTokens.accentError,
-                            ),
-                          ),
-                          const SizedBox(height: AvidTokens.space4),
-
-                          // Recurrence selector
-                          Text(
-                            'Repetir (Frecuencia)',
-                            style: AvidTypography.labelLarge(),
-                          ),
-                          const SizedBox(height: AvidTokens.space2),
-                          DropdownButtonFormField<String?>(
-                            value: _selectedRecurrence,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: AvidTokens.backgroundSecondary,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(
-                                  AvidTokens.radiusMedium,
-                                ),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            dropdownColor: AvidTokens.backgroundSecondary,
-                            items: const [
-                              DropdownMenuItem(
-                                value: null,
-                                child: Text("Una sola vez"),
-                              ),
-                              DropdownMenuItem(
-                                value: AppConstants.recurrenceDaily,
-                                child: Text("Diario"),
-                              ),
-                              DropdownMenuItem(
-                                value: AppConstants.recurrenceWeekly,
-                                child: Text("Semanal"),
-                              ),
-                              DropdownMenuItem(
-                                value: AppConstants.recurrenceBiweekly,
-                                child: Text("Quincenal"),
-                              ),
-                              DropdownMenuItem(
-                                value: AppConstants.recurrenceMonthly,
-                                child: Text("Mensual"),
-                              ),
-                              DropdownMenuItem(
-                                value: AppConstants.recurrenceCustom,
-                                child: Text("Personalizado..."),
-                              ),
-                            ],
-                            onChanged: (val) {
-                              setState(() {
-                                _selectedRecurrence = val;
-                              });
-                            },
-                          ),
-
-                          if (_selectedRecurrence ==
-                              AppConstants.recurrenceCustom) ...[
-                            const SizedBox(height: AvidTokens.space3),
-                            TextFormField(
-                              controller: _customDaysController,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText: 'Cada cuántos días',
-                                filled: true,
-                                fillColor: AvidTokens.backgroundSecondary,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AvidTokens.radiusMedium,
-                                  ),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                          ],
-
-                          const SizedBox(height: AvidTokens.space6),
-
-                          // Submit button - Futuristic and clean
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient:
-                                  _selectedType ==
-                                      AppConstants.transactionTypeIncome
-                                  ? AvidTokens.gradientSuccess
-                                  : AvidTokens.gradientPrimary,
-                              borderRadius: BorderRadius.circular(
                                 AvidTokens.radiusLarge,
                               ),
-                              boxShadow: AvidTokens.shadowGlowSubtle,
                             ),
-                            child: ElevatedButton(
-                              onPressed: _handleSubmit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: AvidTokens.space5,
+                            child: Column(
+                              children: [
+                                // Obligatory switch
+                                SwitchListTile(
+                                  title: Text(
+                                    'Gasto Obligatorio',
+                                    style: AvidTypography.bodyMedium(),
+                                  ),
+                                  value: _isObligatory,
+                                  onChanged: (val) =>
+                                      setState(() => _isObligatory = val),
+                                  activeColor: AvidTokens.accentPrimary,
+                                  inactiveTrackColor: AvidTokens.borderPrimary,
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AvidTokens.radiusLarge,
+                                const Divider(
+                                  height: 1,
+                                  indent: 16,
+                                  color: AvidTokens.borderPrimary,
+                                ),
+                                // Merchant
+                                TextFormField(
+                                  controller: _merchantController,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Comercio / Vendedor',
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                    prefixIcon: Icon(
+                                      Icons.storefront,
+                                      size: 20,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              child: Text(
-                                'Agregar Transacción',
-                                style: AvidTypography.labelLarge(),
-                              ),
+                                const Divider(
+                                  height: 1,
+                                  indent: 48,
+                                  color: AvidTokens.borderPrimary,
+                                ),
+                                // Note
+                                TextFormField(
+                                  controller: _noteController,
+                                  maxLines: 2,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Nota especial',
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
+                                    prefixIcon: Icon(Icons.notes, size: 20),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
+                    const SizedBox(height: AvidTokens.space8),
+
+                    // Submit button
+                    ElevatedButton(
+                      onPressed: _handleSubmit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AvidTokens.textPrimary,
+                        foregroundColor: AvidTokens.backgroundPrimary,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AvidTokens.radiusRound,
+                          ),
+                        ),
+                      ),
+                      child: Text(
+                        'Guardar Transacción',
+                        style: AvidTypography.labelLarge(
+                          color: AvidTokens.backgroundPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -661,37 +702,26 @@ class _TypeToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: AvidTokens.space3),
+      child: AnimatedContainer(
+        duration: AppConstants.animationFast,
+        padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(colors: [color, color.withOpacity(0.8)])
-              : null,
-          color: isSelected ? null : Colors.transparent,
+          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(AvidTokens.radiusMedium),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: color.withOpacity(0.3),
-                    blurRadius: 8,
-                    spreadRadius: 0,
-                  ),
-                ]
-              : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : AvidTokens.textTertiary,
+              color: isSelected ? color : AvidTokens.textTertiary,
               size: 20,
             ),
-            const SizedBox(width: AvidTokens.space2),
+            const SizedBox(width: 8),
             Text(
               label,
               style: AvidTypography.labelMedium(
-                color: isSelected ? Colors.white : AvidTokens.textTertiary,
+                color: isSelected ? color : AvidTokens.textSecondary,
               ),
             ),
           ],
