@@ -38,9 +38,14 @@ class AppSettings extends Equatable {
     return AppSettings(
       selectedAccountId: json['selectedAccountId'] as String?,
       monthCursor: json['monthCursor'] as String?,
-      heatmapRange: json['heatmapRange'] as String? ?? AppConstants.defaultHeatmapRange,
-      allowFutureTransactions: json['allowFutureTransactions'] as bool? ?? AppConstants.defaultAllowFutureTransactions,
-      safetyBuffer: (json['safetyBuffer'] as num?)?.toDouble() ?? AppConstants.defaultSafetyBuffer,
+      heatmapRange:
+          json['heatmapRange'] as String? ?? AppConstants.defaultHeatmapRange,
+      allowFutureTransactions:
+          json['allowFutureTransactions'] as bool? ??
+          AppConstants.defaultAllowFutureTransactions,
+      safetyBuffer:
+          (json['safetyBuffer'] as num?)?.toDouble() ??
+          AppConstants.defaultSafetyBuffer,
     );
   }
 
@@ -67,7 +72,8 @@ class AppSettings extends Equatable {
       selectedAccountId: selectedAccountId ?? this.selectedAccountId,
       monthCursor: monthCursor ?? this.monthCursor,
       heatmapRange: heatmapRange ?? this.heatmapRange,
-      allowFutureTransactions: allowFutureTransactions ?? this.allowFutureTransactions,
+      allowFutureTransactions:
+          allowFutureTransactions ?? this.allowFutureTransactions,
       safetyBuffer: safetyBuffer ?? this.safetyBuffer,
     );
   }
@@ -88,9 +94,7 @@ class AppSettings extends Equatable {
 
   /// Validate settings
   bool get isValid {
-    return safetyBuffer >= 0 &&
-           heatmapRangeDays > 0 &&
-           heatmapRangeDays <= 365;
+    return safetyBuffer >= 0 && heatmapRangeDays > 0 && heatmapRangeDays <= 365;
   }
 
   /// Get available heatmap ranges
@@ -144,21 +148,31 @@ class AppState extends Equatable {
   /// Create state from JSON
   factory AppState.fromJson(Map<String, dynamic> json) {
     return AppState(
-      accounts: (json['accounts'] as List<dynamic>?)
-          ?.map((e) => Account.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
-      categories: (json['categories'] as List<dynamic>?)
-          ?.map((e) => Category.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
-      transactions: (json['transactions'] as List<dynamic>?)
-          ?.map((e) => Transaction.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
-      recurrenceRules: (json['recurrenceRules'] as List<dynamic>?)
-          ?.map((e) => RecurrenceRule.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
-      plannedSpends: (json['plannedSpends'] as List<dynamic>?)
-          ?.map((e) => PlannedSpend.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [],
+      accounts:
+          (json['accounts'] as List<dynamic>?)
+              ?.map((e) => Account.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      categories:
+          (json['categories'] as List<dynamic>?)
+              ?.map((e) => Category.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      transactions:
+          (json['transactions'] as List<dynamic>?)
+              ?.map((e) => Transaction.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      recurrenceRules:
+          (json['recurrenceRules'] as List<dynamic>?)
+              ?.map((e) => RecurrenceRule.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      plannedSpends:
+          (json['plannedSpends'] as List<dynamic>?)
+              ?.map((e) => PlannedSpend.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
       settings: json['settings'] != null
           ? AppSettings.fromJson(json['settings'] as Map<String, dynamic>)
           : AppSettings.defaults(),
@@ -197,16 +211,20 @@ class AppState extends Equatable {
   }
 
   /// Get active (non-archived) accounts
-  List<Account> get activeAccounts => accounts.where((a) => !a.isArchived).toList();
+  List<Account> get activeAccounts =>
+      accounts.where((a) => !a.isArchived).toList();
 
   /// Get archived accounts
-  List<Account> get archivedAccounts => accounts.where((a) => a.isArchived).toList();
+  List<Account> get archivedAccounts =>
+      accounts.where((a) => a.isArchived).toList();
 
   /// Get active categories
-  List<Category> get activeCategories => categories.where((c) => !c.isArchived).toList();
+  List<Category> get activeCategories =>
+      categories.where((c) => !c.isArchived).toList();
 
   /// Get archived categories
-  List<Category> get archivedCategories => categories.where((c) => c.isArchived).toList();
+  List<Category> get archivedCategories =>
+      categories.where((c) => c.isArchived).toList();
 
   /// Get selected account
   Account? get selectedAccount {
@@ -220,7 +238,9 @@ class AppState extends Equatable {
   /// Get transactions for selected account
   List<Transaction> get selectedAccountTransactions {
     if (selectedAccount == null) return [];
-    return transactions.where((t) => t.accountId == selectedAccount!.id).toList();
+    return transactions
+        .where((t) => t.accountId == selectedAccount!.id)
+        .toList();
   }
 
   /// Get transactions for account
@@ -255,7 +275,14 @@ class AppState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [accounts, categories, transactions, recurrenceRules, plannedSpends, settings];
+  List<Object?> get props => [
+    accounts,
+    categories,
+    transactions,
+    recurrenceRules,
+    plannedSpends,
+    settings,
+  ];
 
   @override
   String toString() {

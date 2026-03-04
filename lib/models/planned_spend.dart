@@ -101,9 +101,9 @@ class PlannedSpend extends Equatable {
   /// Validate planned spend data
   bool get isValid {
     return amount > 0 &&
-           amount <= AppConstants.maxAmount &&
-           accountId.trim().isNotEmpty &&
-           (note == null || note!.length <= AppConstants.maxNoteLength);
+        amount <= AppConstants.maxAmount &&
+        accountId.trim().isNotEmpty &&
+        (note == null || note!.length <= AppConstants.maxNoteLength);
   }
 
   /// Check if planned spend is in the future
@@ -125,7 +125,15 @@ class PlannedSpend extends Equatable {
   String get shortDate => DateUtils.formatShortDate(date);
 
   @override
-  List<Object?> get props => [id, amount, date, accountId, note, createdAt, updatedAt];
+  List<Object?> get props => [
+    id,
+    amount,
+    date,
+    accountId,
+    note,
+    createdAt,
+    updatedAt,
+  ];
 
   @override
   String toString() {
@@ -150,7 +158,13 @@ class SpendPrediction extends Equatable {
   final List<PredictionDetail> details;
 
   @override
-  List<Object?> get props => [plannedSpend, isSafe, projectedBalance, conflicts, details];
+  List<Object?> get props => [
+    plannedSpend,
+    isSafe,
+    projectedBalance,
+    conflicts,
+    details,
+  ];
 
   @override
   String toString() {

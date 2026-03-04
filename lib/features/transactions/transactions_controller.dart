@@ -39,7 +39,12 @@ class TransactionsController extends GetxController {
       _plannedSpends.clear();
       clearError();
     } catch (e) {
-      setError(UnknownError(message: 'Failed to load transactions', details: e.toString()));
+      setError(
+        UnknownError(
+          message: 'Failed to load transactions',
+          details: e.toString(),
+        ),
+      );
     }
   }
 
@@ -49,7 +54,12 @@ class TransactionsController extends GetxController {
       try {
         await _saveToStorage();
       } catch (e) {
-        setError(StorageWriteError(message: 'Failed to save transactions', details: e.toString()));
+        setError(
+          StorageWriteError(
+            message: 'Failed to save transactions',
+            details: e.toString(),
+          ),
+        );
       }
     });
   }
@@ -105,7 +115,9 @@ class TransactionsController extends GetxController {
       );
 
       if (!transaction.isValid) {
-        return Result.failure(ValidationError(message: 'Invalid transaction data'));
+        return Result.failure(
+          ValidationError(message: 'Invalid transaction data'),
+        );
       }
 
       _transactions.add(transaction);
@@ -113,7 +125,10 @@ class TransactionsController extends GetxController {
 
       return Result.success(transaction);
     } catch (e) {
-      final error = UnknownError(message: 'Failed to create transaction', details: e.toString());
+      final error = UnknownError(
+        message: 'Failed to create transaction',
+        details: e.toString(),
+      );
       setError(error);
       return Result.failure(error);
     }
@@ -123,7 +138,9 @@ class TransactionsController extends GetxController {
   Future<Result<Transaction>> updateTransaction(Transaction transaction) async {
     try {
       if (!transaction.isValid) {
-        return Result.failure(ValidationError(message: 'Invalid transaction data'));
+        return Result.failure(
+          ValidationError(message: 'Invalid transaction data'),
+        );
       }
 
       final index = _transactions.indexWhere((t) => t.id == transaction.id);
@@ -137,7 +154,10 @@ class TransactionsController extends GetxController {
 
       return Result.success(updatedTransaction);
     } catch (e) {
-      final error = UnknownError(message: 'Failed to update transaction', details: e.toString());
+      final error = UnknownError(
+        message: 'Failed to update transaction',
+        details: e.toString(),
+      );
       setError(error);
       return Result.failure(error);
     }
@@ -156,7 +176,10 @@ class TransactionsController extends GetxController {
 
       return const Result.success(null);
     } catch (e) {
-      final error = UnknownError(message: 'Failed to delete transaction', details: e.toString());
+      final error = UnknownError(
+        message: 'Failed to delete transaction',
+        details: e.toString(),
+      );
       setError(error);
       return Result.failure(error);
     }
@@ -168,7 +191,10 @@ class TransactionsController extends GetxController {
   }
 
   /// Get transactions for a specific date range
-  List<Transaction> getTransactionsInRange(DateTime startDate, DateTime endDate) {
+  List<Transaction> getTransactionsInRange(
+    DateTime startDate,
+    DateTime endDate,
+  ) {
     return _transactions.where((t) {
       return !t.date.isBefore(startDate) && !t.date.isAfter(endDate);
     }).toList();
@@ -223,10 +249,14 @@ class TransactionsController extends GetxController {
   }
 
   /// Create recurrence rule
-  Future<Result<RecurrenceRule>> createRecurrenceRule(RecurrenceRule rule) async {
+  Future<Result<RecurrenceRule>> createRecurrenceRule(
+    RecurrenceRule rule,
+  ) async {
     try {
       if (!rule.isValid) {
-        return Result.failure(ValidationError(message: 'Invalid recurrence rule'));
+        return Result.failure(
+          ValidationError(message: 'Invalid recurrence rule'),
+        );
       }
 
       _recurrenceRules.add(rule);
@@ -234,7 +264,10 @@ class TransactionsController extends GetxController {
 
       return Result.success(rule);
     } catch (e) {
-      final error = UnknownError(message: 'Failed to create recurrence rule', details: e.toString());
+      final error = UnknownError(
+        message: 'Failed to create recurrence rule',
+        details: e.toString(),
+      );
       setError(error);
       return Result.failure(error);
     }
@@ -244,7 +277,9 @@ class TransactionsController extends GetxController {
   Future<Result<PlannedSpend>> createPlannedSpend(PlannedSpend spend) async {
     try {
       if (!spend.isValid) {
-        return Result.failure(ValidationError(message: 'Invalid planned spend'));
+        return Result.failure(
+          ValidationError(message: 'Invalid planned spend'),
+        );
       }
 
       _plannedSpends.add(spend);
@@ -252,7 +287,10 @@ class TransactionsController extends GetxController {
 
       return Result.success(spend);
     } catch (e) {
-      final error = UnknownError(message: 'Failed to create planned spend', details: e.toString());
+      final error = UnknownError(
+        message: 'Failed to create planned spend',
+        details: e.toString(),
+      );
       setError(error);
       return Result.failure(error);
     }
@@ -262,12 +300,16 @@ class TransactionsController extends GetxController {
   Future<Result<PlannedSpend>> updatePlannedSpend(PlannedSpend spend) async {
     try {
       if (!spend.isValid) {
-        return Result.failure(ValidationError(message: 'Invalid planned spend'));
+        return Result.failure(
+          ValidationError(message: 'Invalid planned spend'),
+        );
       }
 
       final index = _plannedSpends.indexWhere((s) => s.id == spend.id);
       if (index == -1) {
-        return Result.failure(NotFoundError(message: 'Planned spend not found'));
+        return Result.failure(
+          NotFoundError(message: 'Planned spend not found'),
+        );
       }
 
       final updatedSpend = spend.markUpdated();
@@ -276,7 +318,10 @@ class TransactionsController extends GetxController {
 
       return Result.success(updatedSpend);
     } catch (e) {
-      final error = UnknownError(message: 'Failed to update planned spend', details: e.toString());
+      final error = UnknownError(
+        message: 'Failed to update planned spend',
+        details: e.toString(),
+      );
       setError(error);
       return Result.failure(error);
     }
@@ -287,7 +332,9 @@ class TransactionsController extends GetxController {
     try {
       final index = _plannedSpends.indexWhere((s) => s.id == spendId);
       if (index == -1) {
-        return Result.failure(NotFoundError(message: 'Planned spend not found'));
+        return Result.failure(
+          NotFoundError(message: 'Planned spend not found'),
+        );
       }
 
       _plannedSpends.removeAt(index);
@@ -295,7 +342,10 @@ class TransactionsController extends GetxController {
 
       return const Result.success(null);
     } catch (e) {
-      final error = UnknownError(message: 'Failed to delete planned spend', details: e.toString());
+      final error = UnknownError(
+        message: 'Failed to delete planned spend',
+        details: e.toString(),
+      );
       setError(error);
       return Result.failure(error);
     }

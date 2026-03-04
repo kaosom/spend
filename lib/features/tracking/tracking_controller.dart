@@ -30,8 +30,14 @@ class GridCell extends Equatable {
 
   @override
   List<Object?> get props => [
-    date, isInMonth, isToday, isFuture, expenseTotal, netTotal,
-    transactionCount, hasObligatory
+    date,
+    isInMonth,
+    isToday,
+    isFuture,
+    expenseTotal,
+    netTotal,
+    transactionCount,
+    hasObligatory,
   ];
 }
 
@@ -52,7 +58,13 @@ class HeatmapCell extends Equatable {
   final bool hasObligatory;
 
   @override
-  List<Object?> get props => [date, intensity, expenseTotal, transactionCount, hasObligatory];
+  List<Object?> get props => [
+    date,
+    intensity,
+    expenseTotal,
+    transactionCount,
+    hasObligatory,
+  ];
 }
 
 /// Controller for tracking views (Grid and Heatmap)
@@ -64,7 +76,6 @@ class TrackingController extends GetxController {
   List<GridCell> get gridCells => _gridCells;
   List<List<HeatmapCell>> get heatmapCells => _heatmapCells;
   String get currentView => _currentView.value;
-
 
   /// Switch to grid view
   void switchToGrid() {
@@ -90,7 +101,9 @@ class TrackingController extends GetxController {
       return;
     }
 
-    final monthDate = DateUtils.parseMonthCursor(transactionsController.monthCursor);
+    final monthDate = DateUtils.parseMonthCursor(
+      transactionsController.monthCursor,
+    );
     final monthStart = DateUtils.getMonthStart(monthDate);
     final monthEnd = DateUtils.getMonthEnd(monthDate);
 
@@ -98,13 +111,18 @@ class TrackingController extends GetxController {
     final gridStart = DateUtils.getWeekStart(monthStart);
     final gridEnd = DateUtils.getWeekEnd(monthEnd);
 
-    final transactions = transactionsController.getTransactionsInRange(gridStart, gridEnd)
+    final transactions = transactionsController
+        .getTransactionsInRange(gridStart, gridEnd)
         .where((t) => t.accountId == selectedAccount.id)
         .toList();
 
-    final dailyTotals = transactionsController.getDailyTotals(gridStart, gridEnd)
-        .where((dt) => dt.date.isAfter(gridStart.subtract(const Duration(days: 1))) &&
-                      dt.date.isBefore(gridEnd.add(const Duration(days: 1))))
+    final dailyTotals = transactionsController
+        .getDailyTotals(gridStart, gridEnd)
+        .where(
+          (dt) =>
+              dt.date.isAfter(gridStart.subtract(const Duration(days: 1))) &&
+              dt.date.isBefore(gridEnd.add(const Duration(days: 1))),
+        )
         .toList();
 
     // Group transactions by date for additional data
@@ -123,26 +141,28 @@ class TrackingController extends GetxController {
       final dayTransactions = transactionsByDate[dateKey] ?? [];
       final dayTotals = dailyTotals.firstWhere(
         (dt) => dt.dateKey == dateKey,
-        orElse: () => DailyTotals(
-          date: currentDate,
-          income: 0,
-          expense: 0,
-          net: 0,
-        ),
+        orElse: () =>
+            DailyTotals(date: currentDate, income: 0, expense: 0, net: 0),
       );
 
       final hasObligatory = dayTransactions.any((t) => t.isObligatory);
 
-      cells.add(GridCell(
-        date: currentDate,
-        isInMonth: currentDate.month == monthDate.month && currentDate.year == monthDate.year,
-        isToday: DateUtils.isToday(currentDate),
-        isFuture: DateUtils.isFuture(currentDate) && !settingsController.allowFutureTransactions,
-        expenseTotal: dayTotals.expense,
-        netTotal: dayTotals.net,
-        transactionCount: dayTransactions.length,
-        hasObligatory: hasObligatory,
-      ));
+      cells.add(
+        GridCell(
+          date: currentDate,
+          isInMonth:
+              currentDate.month == monthDate.month &&
+              currentDate.year == monthDate.year,
+          isToday: DateUtils.isToday(currentDate),
+          isFuture:
+              DateUtils.isFuture(currentDate) &&
+              !settingsController.allowFutureTransactions,
+          expenseTotal: dayTotals.expense,
+          netTotal: dayTotals.net,
+          transactionCount: dayTransactions.length,
+          hasObligatory: hasObligatory,
+        ),
+      );
 
       currentDate = currentDate.add(const Duration(days: 1));
     }
@@ -166,14 +186,19 @@ class TrackingController extends GetxController {
     final endDate = DateTime.now();
     final startDate = endDate.subtract(Duration(days: rangeDays - 1));
 
-    final transactions = transactionsController.getTransactionsInRange(startDate, endDate)
+    final transactions = transactionsController
+        .getTransactionsInRange(startDate, endDate)
         .where((t) => t.accountId == selectedAccount.id)
         .toList();
 
     // Calculate max expense for intensity scaling
-    final dailyTotals = transactionsController.getDailyTotals(startDate, endDate);
-    final maxExpense = dailyTotals.isEmpty ? 0.0 :
-        dailyTotals.map((dt) => dt.expense).reduce((a, b) => a > b ? a : b);
+    final dailyTotals = transactionsController.getDailyTotals(
+      startDate,
+      endDate,
+    );
+    final maxExpense = dailyTotals.isEmpty
+        ? 0.0
+        : dailyTotals.map((dt) => dt.expense).reduce((a, b) => a > b ? a : b);
 
     // Group transactions by date
     final transactionsByDate = <String, List<Transaction>>{};
@@ -192,8 +217,9 @@ class TrackingController extends GetxController {
     }
 
     // Calculate the number of weeks needed
-    final weeksNeeded = ((endDate.difference(currentDate).inDays / 7).ceil() + 1);
-    
+    final weeksNeeded =
+        ((endDate.difference(currentDate).inDays / 7).ceil() + 1);
+
     // Create 7 rows (Sun-Sat)
     for (var dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
       final row = <HeatmapCell>[];
@@ -207,33 +233,35 @@ class TrackingController extends GetxController {
           final dayTransactions = transactionsByDate[dateKey] ?? [];
           final dayTotals = dailyTotals.firstWhere(
             (dt) => dt.dateKey == dateKey,
-            orElse: () => DailyTotals(
-              date: weekDate,
-              income: 0,
-              expense: 0,
-              net: 0,
-            ),
+            orElse: () =>
+                DailyTotals(date: weekDate, income: 0, expense: 0, net: 0),
           );
 
-          final intensity = maxExpense == 0 ? 0.0 : (dayTotals.expense / maxExpense).clamp(0.0, 1.0);
+          final intensity = maxExpense == 0
+              ? 0.0
+              : (dayTotals.expense / maxExpense).clamp(0.0, 1.0);
           final hasObligatory = dayTransactions.any((t) => t.isObligatory);
 
-          row.add(HeatmapCell(
-            date: weekDate,
-            intensity: intensity,
-            expenseTotal: dayTotals.expense,
-            transactionCount: dayTransactions.length,
-            hasObligatory: hasObligatory,
-          ));
+          row.add(
+            HeatmapCell(
+              date: weekDate,
+              intensity: intensity,
+              expenseTotal: dayTotals.expense,
+              transactionCount: dayTransactions.length,
+              hasObligatory: hasObligatory,
+            ),
+          );
         } else {
           // Add empty cell to maintain consistent row length
-          row.add(HeatmapCell(
-            date: weekDate,
-            intensity: 0.0,
-            expenseTotal: 0.0,
-            transactionCount: 0,
-            hasObligatory: false,
-          ));
+          row.add(
+            HeatmapCell(
+              date: weekDate,
+              intensity: 0.0,
+              expenseTotal: 0.0,
+              transactionCount: 0,
+              hasObligatory: false,
+            ),
+          );
         }
 
         weekDate = weekDate.add(const Duration(days: 7));

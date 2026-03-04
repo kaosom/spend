@@ -63,7 +63,9 @@ class AvidTheme {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(AvidTokens.radiusMedium)),
+          borderRadius: BorderRadius.all(
+            Radius.circular(AvidTokens.radiusMedium),
+          ),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -198,7 +200,9 @@ class AvidTheme {
         backgroundColor: AvidTokens.backgroundSecondary,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(AvidTokens.radiusLarge)),
+          borderRadius: BorderRadius.all(
+            Radius.circular(AvidTokens.radiusLarge),
+          ),
         ),
       ),
 
@@ -221,10 +225,7 @@ class AvidTheme {
       ),
 
       // Icon theme
-      iconTheme: const IconThemeData(
-        color: AvidTokens.textPrimary,
-        size: 24,
-      ),
+      iconTheme: const IconThemeData(color: AvidTokens.textPrimary, size: 24),
 
       // Chip theme
       chipTheme: ChipThemeData(

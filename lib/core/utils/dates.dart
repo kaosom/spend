@@ -3,10 +3,18 @@ import '../../core/constants/constants.dart';
 
 /// Date utility functions for Avid Spend
 class DateUtils {
-  static final DateFormat _dateKeyFormat = DateFormat(AppConstants.dateKeyFormat);
-  static final DateFormat _displayDateFormat = DateFormat(AppConstants.displayDateFormat);
-  static final DateFormat _shortDateFormat = DateFormat(AppConstants.shortDateFormat);
-  static final DateFormat _monthYearFormat = DateFormat(AppConstants.monthYearFormat);
+  static final DateFormat _dateKeyFormat = DateFormat(
+    AppConstants.dateKeyFormat,
+  );
+  static final DateFormat _displayDateFormat = DateFormat(
+    AppConstants.displayDateFormat,
+  );
+  static final DateFormat _shortDateFormat = DateFormat(
+    AppConstants.shortDateFormat,
+  );
+  static final DateFormat _monthYearFormat = DateFormat(
+    AppConstants.monthYearFormat,
+  );
 
   /// Convert DateTime to date key string (YYYY-MM-DD)
   static String toDateKey(DateTime date) {
@@ -53,7 +61,16 @@ class DateUtils {
     final maxDaysInNewMonth = DateTime(newYear, newMonth + 1, 0).day;
     final adjustedDay = newDay > maxDaysInNewMonth ? maxDaysInNewMonth : newDay;
 
-    return DateTime(newYear, newMonth, adjustedDay, date.hour, date.minute, date.second, date.millisecond, date.microsecond);
+    return DateTime(
+      newYear,
+      newMonth,
+      adjustedDay,
+      date.hour,
+      date.minute,
+      date.second,
+      date.millisecond,
+      date.microsecond,
+    );
   }
 
   /// Subtract months from a date safely
@@ -77,8 +94,8 @@ class DateUtils {
   /// Check if two dates are the same day
   static bool isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year &&
-           date1.month == date2.month &&
-           date1.day == date2.day;
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
   /// Check if date is today
@@ -115,7 +132,9 @@ class DateUtils {
     var currentDate = getWeekStart(monthStart);
 
     // Continue until we've covered the entire month and any trailing days
-    while (currentDate.isBefore(monthEnd) || currentDate.isAtSameMomentAs(monthEnd) || currentWeek.isNotEmpty) {
+    while (currentDate.isBefore(monthEnd) ||
+        currentDate.isAtSameMomentAs(monthEnd) ||
+        currentWeek.isNotEmpty) {
       currentWeek.add(currentDate);
 
       if (currentWeek.length == 7) {

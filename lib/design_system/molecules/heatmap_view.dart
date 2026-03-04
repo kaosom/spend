@@ -12,15 +12,12 @@ class HeatmapView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<TrackingController>();
-    
+
     return Obx(() {
       final heatmapData = controller.heatmapCells;
       if (heatmapData.isEmpty) {
         return Center(
-          child: Text(
-            'No data available',
-            style: AvidTypography.bodyMedium(),
-          ),
+          child: Text('No data available', style: AvidTypography.bodyMedium()),
         );
       }
 
@@ -31,57 +28,62 @@ class HeatmapView extends StatelessWidget {
           children: [
             // Day labels
             Padding(
-              padding: const EdgeInsets.only(left: AvidTokens.space6, bottom: AvidTokens.space2),
+              padding: const EdgeInsets.only(
+                left: AvidTokens.space6,
+                bottom: AvidTokens.space2,
+              ),
               child: Row(
                 children: [
                   SizedBox(
                     width: 40,
                     child: Column(
                       children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-                          .map((day) => Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 2),
-                                  child: Text(
-                                    day,
-                                    style: AvidTypography.labelSmall(color: AvidTokens.textTertiary),
-                                  ),
-                              ))
+                          .map(
+                            (day) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2),
+                              child: Text(
+                                day,
+                                style: AvidTypography.labelSmall(
+                                  color: AvidTokens.textTertiary,
+                                ),
+                              ),
+                            ),
+                          )
                           .toList(),
                     ),
                   ),
                   const SizedBox(width: AvidTokens.space2),
                   // Heatmap cells
                   Row(
-                    children: heatmapData.isNotEmpty && heatmapData[0].isNotEmpty
+                    children:
+                        heatmapData.isNotEmpty && heatmapData[0].isNotEmpty
                         ? List.generate(
                             heatmapData[0].length,
                             (weekIndex) => Column(
-                              children: List.generate(
-                                7,
-                                (dayIndex) {
-                                  // Safe access with bounds checking
-                                  if (dayIndex < heatmapData.length &&
-                                      weekIndex < heatmapData[dayIndex].length) {
-                                    return Padding(
-                                      padding: const EdgeInsets.all(2),
-                                      child: _HeatmapCellWidget(
-                                        cell: heatmapData[dayIndex][weekIndex],
-                                      ),
-                                    );
-                                  }
-                                  // Return empty cell if out of bounds
+                              children: List.generate(7, (dayIndex) {
+                                // Safe access with bounds checking
+                                if (dayIndex < heatmapData.length &&
+                                    weekIndex < heatmapData[dayIndex].length) {
                                   return Padding(
                                     padding: const EdgeInsets.all(2),
-                                    child: Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        color: AvidTokens.backgroundSecondary,
-                                        borderRadius: BorderRadius.circular(2),
-                                      ),
+                                    child: _HeatmapCellWidget(
+                                      cell: heatmapData[dayIndex][weekIndex],
                                     ),
                                   );
-                                },
-                              ),
+                                }
+                                // Return empty cell if out of bounds
+                                return Padding(
+                                  padding: const EdgeInsets.all(2),
+                                  child: Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                      color: AvidTokens.backgroundSecondary,
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                );
+                              }),
                             ),
                           )
                         : [],
@@ -124,7 +126,8 @@ class _HeatmapCellWidget extends StatelessWidget {
     }
 
     return Tooltip(
-      message: '${AppDateUtils.DateUtils.formatDisplayDate(cell.date)}\n'
+      message:
+          '${AppDateUtils.DateUtils.formatDisplayDate(cell.date)}\n'
           'Expense: \$${cell.expenseTotal.toStringAsFixed(2)}\n'
           'Transactions: ${cell.transactionCount}',
       child: Container(
@@ -134,10 +137,7 @@ class _HeatmapCellWidget extends StatelessWidget {
           color: cellColor,
           borderRadius: BorderRadius.circular(2),
           border: isToday
-              ? Border.all(
-                  color: AvidTokens.accentPrimary,
-                  width: 2,
-                )
+              ? Border.all(color: AvidTokens.accentPrimary, width: 2)
               : null,
           boxShadow: isToday
               ? [
@@ -153,4 +153,3 @@ class _HeatmapCellWidget extends StatelessWidget {
     );
   }
 }
-

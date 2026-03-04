@@ -35,7 +35,8 @@ class Throttle {
   final Duration _interval;
   bool _isReady = true;
 
-  Throttle([Duration? interval]) : _interval = interval ?? AppConstants.debounceNormal;
+  Throttle([Duration? interval])
+    : _interval = interval ?? AppConstants.debounceNormal;
 
   /// Execute function immediately if ready, otherwise queue for next interval
   void call(void Function() action) {
@@ -80,7 +81,8 @@ class DebouncedFunction {
   final void Function() _action;
   final Debounce _debounce;
 
-  DebouncedFunction(this._action, [Duration? delay]) : _debounce = Debounce(delay);
+  DebouncedFunction(this._action, [Duration? delay])
+    : _debounce = Debounce(delay);
 
   /// Call the debounced function
   void call() => _debounce.call(_action);
@@ -100,7 +102,8 @@ class ThrottledFunction {
   final void Function() _action;
   final Throttle _throttle;
 
-  ThrottledFunction(this._action, [Duration? interval]) : _throttle = Throttle(interval);
+  ThrottledFunction(this._action, [Duration? interval])
+    : _throttle = Throttle(interval);
 
   /// Call the throttled function
   void call() => _throttle.call(_action);

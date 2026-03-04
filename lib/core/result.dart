@@ -28,7 +28,9 @@ extension ResultExtensions<T> on Result<T> {
   }
 
   /// Chain async operations that return Results
-  Future<Result<R>> flatMapAsync<R>(Future<Result<R>> Function(T) transform) async {
+  Future<Result<R>> flatMapAsync<R>(
+    Future<Result<R>> Function(T) transform,
+  ) async {
     if (isSuccess) {
       return await transform(data as T);
     }
@@ -109,18 +111,23 @@ class ResultUtils {
     if (result1.isFailure) return Result.failure(result1.error!);
     if (result2.isFailure) return Result.failure(result2.error!);
     if (result3.isFailure) return Result.failure(result3.error!);
-    return Result.success((result1.data as T1, result2.data as T2, result3.data as T3));
+    return Result.success((
+      result1.data as T1,
+      result2.data as T2,
+      result3.data as T3,
+    ));
   }
 
   /// Execute an operation and return a Result, catching exceptions
-  static Result<T> tryCatch<T>(
-    T Function() operation, {
-    String? errorMessage,
-  }) {
+  static Result<T> tryCatch<T>(T Function() operation, {String? errorMessage}) {
     try {
       return Result.success(operation());
     } catch (e, stackTrace) {
-      final error = UnknownError(message: errorMessage ?? 'Operation failed', details: e.toString(), stackTrace: stackTrace);
+      final error = UnknownError(
+        message: errorMessage ?? 'Operation failed',
+        details: e.toString(),
+        stackTrace: stackTrace,
+      );
       return Result.failure(error);
     }
   }
@@ -134,7 +141,11 @@ class ResultUtils {
       final result = await operation();
       return Result.success(result);
     } catch (e, stackTrace) {
-      final error = UnknownError(message: errorMessage ?? 'Operation failed', details: e.toString(), stackTrace: stackTrace);
+      final error = UnknownError(
+        message: errorMessage ?? 'Operation failed',
+        details: e.toString(),
+        stackTrace: stackTrace,
+      );
       return Result.failure(error);
     }
   }

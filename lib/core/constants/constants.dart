@@ -6,7 +6,8 @@ class AppConstants {
 
   // Storage
   static const String storageVersion = 'v1';
-  static const String encryptedStorageKey = 'avid_spend_${storageVersion}_encrypted';
+  static const String encryptedStorageKey =
+      'avid_spend_${storageVersion}_encrypted';
   static const String encryptionKeyKeychainKey = 'avid_spend_encryption_key';
 
   // Database
@@ -75,9 +76,12 @@ class AppConstants {
   // Validation messages
   static const String validationRequired = 'This field is required';
   static const String validationInvalidAmount = 'Please enter a valid amount';
-  static const String validationAmountTooLarge = 'Amount cannot exceed \$$maxAmount';
-  static const String validationNameTooLong = 'Name cannot exceed $maxNameLength characters';
-  static const String validationNoteTooLong = 'Note cannot exceed $maxNoteLength characters';
+  static const String validationAmountTooLarge =
+      'Amount cannot exceed \$$maxAmount';
+  static const String validationNameTooLong =
+      'Name cannot exceed $maxNameLength characters';
+  static const String validationNoteTooLong =
+      'Note cannot exceed $maxNoteLength characters';
 
   // Error messages
   static const String errorGeneric = 'An unexpected error occurred';
@@ -92,8 +96,10 @@ class AppConstants {
   static const String successRestored = 'Restored successfully';
 
   // Confirmation messages
-  static const String confirmDelete = 'Are you sure you want to delete this item?';
-  static const String confirmArchive = 'Are you sure you want to archive this item?';
+  static const String confirmDelete =
+      'Are you sure you want to delete this item?';
+  static const String confirmArchive =
+      'Are you sure you want to archive this item?';
 
   // Empty states
   static const String emptyAccounts = 'No accounts yet';

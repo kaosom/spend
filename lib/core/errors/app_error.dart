@@ -68,11 +68,7 @@ typedef AsyncResult<T> = Future<Result<T>>;
 
 /// Base error class for Avid Spend
 abstract class AppError extends Equatable {
-  const AppError({
-    required this.message,
-    this.details,
-    this.stackTrace,
-  });
+  const AppError({required this.message, this.details, this.stackTrace});
 
   final String message;
   final String? details;
@@ -159,4 +155,3 @@ class UnknownError extends AppError {
     super.stackTrace,
   });
 }
-

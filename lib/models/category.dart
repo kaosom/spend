@@ -116,8 +116,8 @@ class Category extends Equatable {
   /// Validate category data
   bool get isValid {
     return name.trim().isNotEmpty &&
-           name.trim().length <= AppConstants.maxNameLength &&
-           icon.trim().isNotEmpty;
+        name.trim().length <= AppConstants.maxNameLength &&
+        icon.trim().isNotEmpty;
   }
 
   /// Get display color based on preset
@@ -145,7 +145,16 @@ class Category extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, icon, colorPreset, sortIndex, isArchived, createdAt, updatedAt];
+  List<Object?> get props => [
+    id,
+    name,
+    icon,
+    colorPreset,
+    sortIndex,
+    isArchived,
+    createdAt,
+    updatedAt,
+  ];
 
   @override
   String toString() {

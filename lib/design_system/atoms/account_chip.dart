@@ -20,7 +20,7 @@ class AccountChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorString = account.displayColor;
     final colorValue = Color(int.parse(colorString.replaceFirst('#', '0xFF')));
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -34,9 +34,7 @@ class AccountChip extends StatelessWidget {
               : AvidTokens.backgroundSecondary,
           borderRadius: BorderRadius.circular(AvidTokens.radiusMedium),
           border: Border.all(
-            color: isSelected
-                ? colorValue
-                : AvidTokens.borderPrimary,
+            color: isSelected ? colorValue : AvidTokens.borderPrimary,
             width: isSelected ? 1.5 : 1,
           ),
           boxShadow: isSelected
@@ -64,9 +62,9 @@ class AccountChip extends StatelessWidget {
             Text(
               account.name,
               style: isSelected
-                  ? AvidTypography.bodyMedium(color: AvidTokens.textPrimary).copyWith(
-                      fontWeight: FontWeight.w600,
-                    )
+                  ? AvidTypography.bodyMedium(
+                      color: AvidTokens.textPrimary,
+                    ).copyWith(fontWeight: FontWeight.w600)
                   : AvidTypography.bodyMedium(),
             ),
           ],
@@ -75,4 +73,3 @@ class AccountChip extends StatelessWidget {
     );
   }
 }
-

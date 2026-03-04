@@ -132,7 +132,7 @@ class RecurrenceRule extends Equatable {
     return [
       AppConstants.recurrenceWeekly,
       AppConstants.recurrenceBiweekly,
-      AppConstants.recurrenceCustom
+      AppConstants.recurrenceCustom,
     ].contains(pattern);
   }
 
@@ -171,7 +171,9 @@ class RecurrenceRule extends Equatable {
 
   DateTime _getNextWeeklyOccurrence(DateTime afterDate) {
     final daysUntilNext = 7 - afterDate.weekday + 1; // Next Sunday
-    return afterDate.add(Duration(days: daysUntilNext == 7 ? 7 : daysUntilNext));
+    return afterDate.add(
+      Duration(days: daysUntilNext == 7 ? 7 : daysUntilNext),
+    );
   }
 
   DateTime _getNextBiweeklyOccurrence(DateTime afterDate) {
@@ -189,7 +191,8 @@ class RecurrenceRule extends Equatable {
     final occurrences = <DateTime>[];
     var currentDate = startDate;
 
-    while (currentDate.isBefore(endDate) || currentDate.isAtSameMomentAs(endDate)) {
+    while (currentDate.isBefore(endDate) ||
+        currentDate.isAtSameMomentAs(endDate)) {
       occurrences.add(currentDate);
 
       final nextDate = getNextOccurrence(currentDate);
@@ -216,7 +219,15 @@ class RecurrenceRule extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, pattern, interval, endDate, occurrencesLeft, createdAt, updatedAt];
+  List<Object?> get props => [
+    id,
+    pattern,
+    interval,
+    endDate,
+    occurrencesLeft,
+    createdAt,
+    updatedAt,
+  ];
 
   @override
   String toString() {

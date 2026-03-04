@@ -37,7 +37,9 @@ class SettingsController extends GetxController {
       _settings.value = AppSettings.defaults();
       clearError();
     } catch (e) {
-      setError(UnknownError(message: 'Failed to load settings', details: e.toString()));
+      setError(
+        UnknownError(message: 'Failed to load settings', details: e.toString()),
+      );
     }
   }
 
@@ -47,7 +49,12 @@ class SettingsController extends GetxController {
       try {
         await _saveToStorage();
       } catch (e) {
-        setError(StorageWriteError(message: 'Failed to save settings', details: e.toString()));
+        setError(
+          StorageWriteError(
+            message: 'Failed to save settings',
+            details: e.toString(),
+          ),
+        );
       }
     });
   }
@@ -74,7 +81,10 @@ class SettingsController extends GetxController {
 
       return const Result.success(null);
     } catch (e) {
-      final error = UnknownError(message: 'Failed to update settings', details: e.toString());
+      final error = UnknownError(
+        message: 'Failed to update settings',
+        details: e.toString(),
+      );
       setError(error);
       return Result.failure(error);
     }

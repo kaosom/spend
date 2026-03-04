@@ -7,9 +7,7 @@ import '../../core/constants/constants.dart';
 /// Secure storage service for iOS Keychain operations
 class KeychainService {
   static const FlutterSecureStorage _storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock_this_device,
       groupId: null, // Use default group
@@ -25,11 +23,13 @@ class KeychainService {
       );
       return const Result.success(null);
     } catch (e, stackTrace) {
-      return Result.failure(KeychainError(
-        message: 'Failed to store encryption key',
-        details: e.toString(),
-        stackTrace: stackTrace,
-      ));
+      return Result.failure(
+        KeychainError(
+          message: 'Failed to store encryption key',
+          details: e.toString(),
+          stackTrace: stackTrace,
+        ),
+      );
     }
   }
 
@@ -41,11 +41,13 @@ class KeychainService {
       );
       return Result.success(key);
     } catch (e, stackTrace) {
-      return Result.failure(KeychainError(
-        message: 'Failed to retrieve encryption key',
-        details: e.toString(),
-        stackTrace: stackTrace,
-      ));
+      return Result.failure(
+        KeychainError(
+          message: 'Failed to retrieve encryption key',
+          details: e.toString(),
+          stackTrace: stackTrace,
+        ),
+      );
     }
   }
 
@@ -57,27 +59,29 @@ class KeychainService {
       );
       return Result.success(key != null);
     } catch (e, stackTrace) {
-      return Result.failure(KeychainError(
-        message: 'Failed to check encryption key existence',
-        details: e.toString(),
-        stackTrace: stackTrace,
-      ));
+      return Result.failure(
+        KeychainError(
+          message: 'Failed to check encryption key existence',
+          details: e.toString(),
+          stackTrace: stackTrace,
+        ),
+      );
     }
   }
 
   /// Delete encryption key from secure storage
   static Future<Result<void>> deleteEncryptionKey() async {
     try {
-      await _storage.delete(
-        key: AppConstants.encryptionKeyKeychainKey,
-      );
+      await _storage.delete(key: AppConstants.encryptionKeyKeychainKey);
       return const Result.success(null);
     } catch (e, stackTrace) {
-      return Result.failure(KeychainError(
-        message: 'Failed to delete encryption key',
-        details: e.toString(),
-        stackTrace: stackTrace,
-      ));
+      return Result.failure(
+        KeychainError(
+          message: 'Failed to delete encryption key',
+          details: e.toString(),
+          stackTrace: stackTrace,
+        ),
+      );
     }
   }
 
@@ -93,11 +97,13 @@ class KeychainService {
 
       return Result.success(key);
     } catch (e, stackTrace) {
-      return Result.failure(KeychainError(
-        message: 'Failed to generate and store encryption key',
-        details: e.toString(),
-        stackTrace: stackTrace,
-      ));
+      return Result.failure(
+        KeychainError(
+          message: 'Failed to generate and store encryption key',
+          details: e.toString(),
+          stackTrace: stackTrace,
+        ),
+      );
     }
   }
 
@@ -119,11 +125,13 @@ class KeychainService {
       await _storage.deleteAll();
       return const Result.success(null);
     } catch (e, stackTrace) {
-      return Result.failure(KeychainError(
-        message: 'Failed to clear secure storage',
-        details: e.toString(),
-        stackTrace: stackTrace,
-      ));
+      return Result.failure(
+        KeychainError(
+          message: 'Failed to clear secure storage',
+          details: e.toString(),
+          stackTrace: stackTrace,
+        ),
+      );
     }
   }
 }

@@ -8,8 +8,10 @@ class CategoriesController extends GetxController {
   final Rxn<AppError> lastError = Rxn<AppError>();
 
   List<Category> get categories => _categories;
-  List<Category> get activeCategories => _categories.where((c) => !c.isArchived).toList();
-  List<Category> get archivedCategories => _categories.where((c) => c.isArchived).toList();
+  List<Category> get activeCategories =>
+      _categories.where((c) => !c.isArchived).toList();
+  List<Category> get archivedCategories =>
+      _categories.where((c) => c.isArchived).toList();
 
   @override
   void onInit() {
@@ -26,7 +28,12 @@ class CategoriesController extends GetxController {
       }
       clearError();
     } catch (e) {
-      setError(UnknownError(message: 'Failed to load categories', details: e.toString()));
+      setError(
+        UnknownError(
+          message: 'Failed to load categories',
+          details: e.toString(),
+        ),
+      );
     }
   }
 
@@ -36,7 +43,12 @@ class CategoriesController extends GetxController {
       // TODO: Implement storage saving
       clearError();
     } catch (e) {
-      setError(StorageWriteError(message: 'Failed to save categories', details: e.toString()));
+      setError(
+        StorageWriteError(
+          message: 'Failed to save categories',
+          details: e.toString(),
+        ),
+      );
     }
   }
 
@@ -54,7 +66,9 @@ class CategoriesController extends GetxController {
       );
 
       if (!category.isValid) {
-        return Result.failure(ValidationError(message: 'Invalid category data'));
+        return Result.failure(
+          ValidationError(message: 'Invalid category data'),
+        );
       }
 
       _categories.add(category);
@@ -62,7 +76,10 @@ class CategoriesController extends GetxController {
 
       return Result.success(category);
     } catch (e) {
-      final error = UnknownError(message: 'Failed to create category', details: e.toString());
+      final error = UnknownError(
+        message: 'Failed to create category',
+        details: e.toString(),
+      );
       setError(error);
       return Result.failure(error);
     }
@@ -91,4 +108,3 @@ class CategoriesController extends GetxController {
     lastError.value = error;
   }
 }
-

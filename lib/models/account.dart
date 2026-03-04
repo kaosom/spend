@@ -116,13 +116,16 @@ class Account extends Equatable {
   /// Validate account data
   bool get isValid {
     return name.trim().isNotEmpty &&
-           name.trim().length <= AppConstants.maxNameLength &&
-           _isValidType(type);
+        name.trim().length <= AppConstants.maxNameLength &&
+        _isValidType(type);
   }
 
   static bool _isValidType(String type) {
-    return [AppConstants.accountTypeCash, AppConstants.accountTypeDebit, AppConstants.accountTypeCredit]
-        .contains(type);
+    return [
+      AppConstants.accountTypeCash,
+      AppConstants.accountTypeDebit,
+      AppConstants.accountTypeCredit,
+    ].contains(type);
   }
 
   /// Get display color based on preset
@@ -146,7 +149,16 @@ class Account extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, type, colorPreset, sortIndex, isArchived, createdAt, updatedAt];
+  List<Object?> get props => [
+    id,
+    name,
+    type,
+    colorPreset,
+    sortIndex,
+    isArchived,
+    createdAt,
+    updatedAt,
+  ];
 
   @override
   String toString() {

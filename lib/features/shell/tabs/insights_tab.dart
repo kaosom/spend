@@ -34,6 +34,48 @@ class _InsightsTabState extends State<InsightsTab> {
     }
   }
 
+  String _getMonthName(int month) {
+    const months = [
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ];
+    return months[month - 1];
+  }
+
+  String _getDateRangeLabel(DateTime start, DateTime now) {
+    if (_timeFilter == TimeFilter.daily) {
+      if (start.month == now.month && start.year == now.year) {
+        return '${start.day} - ${now.day} de ${_getMonthName(now.month)} ${now.year}';
+      } else if (start.year == now.year) {
+        return '${start.day} de ${_getMonthName(start.month)} - ${now.day} de ${_getMonthName(now.month)} ${now.year}';
+      } else {
+        return '${start.day} ${_getMonthName(start.month)} ${start.year} - ${now.day} ${_getMonthName(now.month)} ${now.year}';
+      }
+    } else if (_timeFilter == TimeFilter.weekly) {
+      if (start.year == now.year) {
+        return '${start.day} ${_getMonthName(start.month)} - ${now.day} ${_getMonthName(now.month)} ${now.year}';
+      } else {
+        return '${start.day} ${_getMonthName(start.month)} ${start.year} - ${now.day} ${_getMonthName(now.month)} ${now.year}';
+      }
+    } else {
+      if (start.year == now.year) {
+        return '${_getMonthName(start.month)} - ${_getMonthName(now.month)} ${now.year}';
+      } else {
+        return '${_getMonthName(start.month)} ${start.year} - ${_getMonthName(now.month)} ${now.year}';
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final txController = Get.find<TransactionsController>();
@@ -128,18 +170,14 @@ class _InsightsTabState extends State<InsightsTab> {
               ),
             ),
             IconButton(
-              onPressed: _timeOffset > 0
-                  ? () {
-                      setState(() {
-                        _timeOffset--;
-                      });
-                    }
-                  : null, // Disable if we are at the present
-              icon: Icon(
+              onPressed: () {
+                setState(() {
+                  _timeOffset--; // Negative offset means future
+                });
+              },
+              icon: const Icon(
                 Icons.chevron_right,
-                color: _timeOffset > 0
-                    ? AvidTokens.textPrimary
-                    : AvidTokens.textTertiary,
+                color: AvidTokens.textPrimary,
               ),
             ),
           ],
@@ -317,6 +355,19 @@ class _InsightsTabState extends State<InsightsTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Temporal Range Label
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: AvidTokens.space3),
+                    child: Text(
+                      _getDateRangeLabel(start, now),
+                      style: AvidTokens.labelMedium.copyWith(
+                        color: AvidTokens.textTertiary,
+                      ),
+                    ),
+                  ),
+                ),
+
                 // Summary Cards
                 InsightSummaryCards(income: totalIncome, expense: totalExpense),
 

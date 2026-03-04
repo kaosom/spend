@@ -10,7 +10,9 @@ class CurrencyUtils {
     decimalDigits: AppConstants.decimalPlaces,
   );
 
-  static final NumberFormat _decimalFormat = NumberFormat.decimalPattern('es_MX');
+  static final NumberFormat _decimalFormat = NumberFormat.decimalPattern(
+    'es_MX',
+  );
 
   /// Format amount as currency string
   static String formatCurrency(double amount) {
@@ -112,6 +114,7 @@ extension CurrencyDoubleExtensions on double {
   String toDecimal() => CurrencyUtils.formatDecimal(this);
   bool isValidAmount() => CurrencyUtils.isValidAmount(this);
   double clamped() => CurrencyUtils.clampAmount(this);
-  double rounded({int decimals = 2}) => CurrencyUtils.round(this, decimals: decimals);
+  double rounded({int decimals = 2}) =>
+      CurrencyUtils.round(this, decimals: decimals);
   double percentage(double percent) => CurrencyUtils.percentage(this, percent);
 }

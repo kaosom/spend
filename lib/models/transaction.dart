@@ -149,17 +149,19 @@ class Transaction extends Equatable {
   /// Validate transaction data
   bool get isValid {
     return amount > 0 &&
-           amount <= AppConstants.maxAmount &&
-           _isValidType(type) &&
-           accountId.trim().isNotEmpty &&
-           categoryId.trim().isNotEmpty &&
-           _isValidNote() &&
-           _isValidMerchant();
+        amount <= AppConstants.maxAmount &&
+        _isValidType(type) &&
+        accountId.trim().isNotEmpty &&
+        categoryId.trim().isNotEmpty &&
+        _isValidNote() &&
+        _isValidMerchant();
   }
 
   bool _isValidType(String type) {
-    return [AppConstants.transactionTypeIncome, AppConstants.transactionTypeExpense]
-        .contains(type);
+    return [
+      AppConstants.transactionTypeIncome,
+      AppConstants.transactionTypeExpense,
+    ].contains(type);
   }
 
   bool _isValidNote() {
@@ -167,7 +169,8 @@ class Transaction extends Equatable {
   }
 
   bool _isValidMerchant() {
-    return merchant == null || merchant!.length <= AppConstants.maxMerchantLength;
+    return merchant == null ||
+        merchant!.length <= AppConstants.maxMerchantLength;
   }
 
   /// Check if transaction is income
@@ -198,8 +201,19 @@ class Transaction extends Equatable {
 
   @override
   List<Object?> get props => [
-    id, amount, date, accountId, categoryId, type, note, merchant,
-    isObligatory, recurrenceRuleId, plannedSpendId, createdAt, updatedAt
+    id,
+    amount,
+    date,
+    accountId,
+    categoryId,
+    type,
+    note,
+    merchant,
+    isObligatory,
+    recurrenceRuleId,
+    plannedSpendId,
+    createdAt,
+    updatedAt,
   ];
 
   @override
@@ -223,7 +237,10 @@ class DailyTotals extends Equatable {
   final double net;
 
   /// Create from list of transactions
-  factory DailyTotals.fromTransactions(DateTime date, List<Transaction> transactions) {
+  factory DailyTotals.fromTransactions(
+    DateTime date,
+    List<Transaction> transactions,
+  ) {
     double income = 0;
     double expense = 0;
 
