@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
@@ -40,12 +43,26 @@ class ProfileTab extends StatelessWidget {
       final fileName = 'avid_spend_backup_$dateStr.json';
 
       // Pick save location via file_picker
+      final bytes = utf8.encode(jsonString);
+
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: 'Guardar respaldo de datos',
         fileName: fileName,
         type: FileType.custom,
         allowedExtensions: ['json'],
+        bytes: Uint8List.fromList(bytes),
       );
+
+      if (kIsWeb) {
+        Get.snackbar(
+          'Exportación Completa',
+          'Archivo descargado exitosamente.',
+          backgroundColor: AvidTokens.accentSuccess,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 4),
+        );
+        return;
+      }
 
       if (outputFile == null) {
         // User canceled the picker
@@ -80,15 +97,24 @@ class ProfileTab extends StatelessWidget {
         type: FileType.custom,
         allowedExtensions: ['json'],
         dialogTitle: 'Selecciona tu archivo de respaldo',
+        withData: true,
       );
 
-      if (result == null || result.files.single.path == null) {
+      if (result == null || result.files.isEmpty) {
         // User canceled
         return;
       }
 
-      final file = File(result.files.single.path!);
-      final jsonString = await file.readAsString();
+      String jsonString;
+      if (kIsWeb) {
+        if (result.files.single.bytes == null)
+          throw 'No se pudo leer el archivo web.';
+        jsonString = utf8.decode(result.files.single.bytes!);
+      } else {
+        if (result.files.single.path == null) throw 'Ruta de archivo inválida.';
+        final file = File(result.files.single.path!);
+        jsonString = await file.readAsString();
+      }
 
       // Ask for confirmation
       final confirm = await Get.dialog<bool>(
@@ -121,7 +147,9 @@ class ProfileTab extends StatelessWidget {
         ),
       );
 
-      if (confirm != true) return;
+      if (confirm != true) {
+        return;
+      }
 
       // Show loading
       Get.dialog(
