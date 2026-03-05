@@ -185,6 +185,22 @@ class _TransactionsTabState extends State<TransactionsTab> {
               final isFuture = info.date.isAfter(today);
               final isPositiveBalance = info.cumulativeBalance >= 0;
 
+              final double dailyNet = info.dailyIncome - info.dailyExpense;
+              final bool isPositiveNet = dailyNet > 0;
+              final bool isNeutralNet = dailyNet == 0;
+
+              final String netText = isNeutralNet
+                  ? '\$0.00'
+                  : '${isPositiveNet ? '+' : '-'}\$${dailyNet.abs().toStringAsFixed(2)}';
+              final Color netColor = isNeutralNet
+                  ? AvidTokens.textTertiary
+                  : (isPositiveNet
+                        ? AvidTokens.accentSuccess
+                        : AvidTokens.textPrimary);
+
+              final String cumulativeText =
+                  '${isPositiveBalance ? '+' : '-'}\$${info.cumulativeBalance.abs().toStringAsFixed(2)}';
+
               // Format date header string
               String dateHeader = AppDateUtils.DateUtils.formatDisplayDate(
                 info.date,
@@ -247,18 +263,15 @@ class _TransactionsTabState extends State<TransactionsTab> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              'Balance Total',
-                              style: AvidTokens.labelSmall.copyWith(
-                                color: AvidTokens.textTertiary,
+                              netText,
+                              style: AvidTokens.heading4.copyWith(
+                                color: netColor,
                               ),
                             ),
                             Text(
-                              '${isPositiveBalance ? '' : '-'}\$${info.cumulativeBalance.abs().toStringAsFixed(2)}',
-                              style: AvidTokens.labelLarge.copyWith(
-                                color: isPositiveBalance
-                                    ? AvidTokens.accentSuccess
-                                    : AvidTokens.textPrimary,
-                                fontWeight: FontWeight.bold,
+                              'Balance relativo: $cumulativeText',
+                              style: AvidTokens.labelSmall.copyWith(
+                                color: AvidTokens.textTertiary,
                               ),
                             ),
                           ],
