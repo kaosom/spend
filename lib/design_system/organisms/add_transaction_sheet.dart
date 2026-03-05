@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../core/errors/app_error.dart';
 import '../../app/theme/tokens.dart';
 import '../../app/theme/typography.dart';
 import '../../core/constants/constants.dart';
@@ -12,9 +13,10 @@ import '../../models/models.dart';
 
 /// Bottom sheet for adding/editing transactions
 class AddTransactionSheet extends StatefulWidget {
-  const AddTransactionSheet({super.key, this.date});
+  const AddTransactionSheet({super.key, this.date, this.transactionToEdit});
 
   final DateTime? date;
+  final Transaction? transactionToEdit;
 
   @override
   State<AddTransactionSheet> createState() => _AddTransactionSheetState();
@@ -43,15 +45,59 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   @override
   void initState() {
     super.initState();
-    _selectedDate = widget.date ?? DateTime.now();
-    _selectedAccount =
+    final editTx = widget.transactionToEdit;
+
+    _selectedDate = editTx?.date ?? widget.date ?? DateTime.now();
+    _selectedType = editTx?.type ?? AppConstants.transactionTypeExpense;
+    _amountController.text = editTx?.amount != null
+        ? editTx!.amount.toString()
+        : '';
+    _noteController.text = editTx?.note ?? '';
+    _merchantController.text = editTx?.merchant ?? '';
+    _isObligatory = editTx?.isObligatory ?? false;
+
+    // Accounts
+    if (editTx != null) {
+      _selectedAccount = _accountsController.accounts.firstWhereOrNull(
+        (a) => a.id == editTx.accountId,
+      );
+    }
+    _selectedAccount ??=
         _accountsController.selectedAccount ??
         (_accountsController.activeAccounts.isNotEmpty
             ? _accountsController.activeAccounts.first
             : null);
-    _selectedCategory = _categoriesController.activeCategories.isNotEmpty
+
+    // Categories
+    if (editTx != null) {
+      _selectedCategory = _categoriesController.categories.firstWhereOrNull(
+        (c) => c.id == editTx.categoryId,
+      );
+    }
+    _selectedCategory ??= _categoriesController.activeCategories.isNotEmpty
         ? _categoriesController.activeCategories.first
         : null;
+
+    // Recurrence
+    if (editTx?.recurrenceRuleId != null) {
+      final rule = _transactionsController.recurrenceRules.firstWhereOrNull(
+        (r) => r.id == editTx!.recurrenceRuleId,
+      );
+      if (rule != null) {
+        if (rule.pattern == AppConstants.recurrenceDaily) {
+          _selectedRecurrence = AppConstants.recurrenceDaily;
+        } else if (rule.pattern == AppConstants.recurrenceWeekly) {
+          _selectedRecurrence = AppConstants.recurrenceWeekly;
+        } else if (rule.pattern == AppConstants.recurrenceBiweekly) {
+          _selectedRecurrence = AppConstants.recurrenceBiweekly;
+        } else if (rule.pattern == AppConstants.recurrenceMonthly) {
+          _selectedRecurrence = AppConstants.recurrenceMonthly;
+        } else {
+          _selectedRecurrence = AppConstants.recurrenceCustom;
+          _customDaysController.text = rule.interval.toString();
+        }
+      }
+    }
   }
 
   @override
@@ -140,28 +186,53 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
       }
     }
 
-    final result = await _transactionsController.createTransaction(
-      amount: amount,
-      date: _selectedDate,
-      accountId: _selectedAccount!.id,
-      categoryId: _selectedCategory!.id,
-      type: _selectedType,
-      note: _noteController.text.trim().isEmpty
-          ? null
-          : _noteController.text.trim(),
-      merchant: _merchantController.text.trim().isEmpty
-          ? null
-          : _merchantController.text.trim(),
-      isObligatory: _isObligatory,
-      recurrenceRule: recurrenceRule,
-    );
+    Result<Transaction> result;
+    final isEditing = widget.transactionToEdit != null;
+
+    if (isEditing) {
+      final updatedTx = widget.transactionToEdit!.copyWith(
+        amount: amount,
+        date: _selectedDate,
+        accountId: _selectedAccount!.id,
+        categoryId: _selectedCategory!.id,
+        type: _selectedType,
+        note: _noteController.text.trim().isEmpty
+            ? null
+            : _noteController.text.trim(),
+        merchant: _merchantController.text.trim().isEmpty
+            ? null
+            : _merchantController.text.trim(),
+        isObligatory: _isObligatory,
+      );
+      // Ensure recurrence rule reference is handled manually in future steps if changed, but simpler keep same ID logic or replace
+      // If we are replacing the recurrence, we should probably update it too. We will simplify for now
+      result = await _transactionsController.updateTransaction(updatedTx);
+    } else {
+      result = await _transactionsController.createTransaction(
+        amount: amount,
+        date: _selectedDate,
+        accountId: _selectedAccount!.id,
+        categoryId: _selectedCategory!.id,
+        type: _selectedType,
+        note: _noteController.text.trim().isEmpty
+            ? null
+            : _noteController.text.trim(),
+        merchant: _merchantController.text.trim().isEmpty
+            ? null
+            : _merchantController.text.trim(),
+        isObligatory: _isObligatory,
+        recurrenceRule: recurrenceRule,
+      );
+    }
 
     if (result.isSuccess) {
       _trackingController.refreshCurrentView();
       Get.back();
       Get.snackbar(
         'Éxito',
-        'Transacción agregada exitosamente',
+        isEditing
+            ? 'Transacción editada correctamente'
+            : 'Transacción agregada exitosamente',
         snackPosition: SnackPosition.TOP,
         backgroundColor: AvidTokens.backgroundTertiary,
         colorText: AvidTokens.textPrimary,
@@ -227,7 +298,12 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
               ),
 
               // Title
-              Text('Agregar Transacción', style: AvidTypography.heading3()),
+              Text(
+                widget.transactionToEdit != null
+                    ? 'Editar Transacción'
+                    : 'Agregar Transacción',
+                style: AvidTypography.heading3(),
+              ),
               const SizedBox(height: AvidTokens.space6),
 
               // Form

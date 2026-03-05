@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../app/theme/tokens.dart';
 import '../../../models/models.dart';
+import 'add_transaction_sheet.dart';
 
 class DailyTransactionList extends StatelessWidget {
   final String dateHeader;
@@ -66,40 +68,49 @@ class DailyTransactionList extends StatelessWidget {
       iconColor = AvidTokens.accentSuccess; // Teal/green
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AvidTokens.space4),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AvidTokens.space3),
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () {
+        Get.bottomSheet(
+          AddTransactionSheet(transactionToEdit: tx),
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: AvidTokens.space4),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AvidTokens.space3),
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: iconColor, size: 24),
             ),
-            child: Icon(icon, color: iconColor, size: 24),
-          ),
-          const SizedBox(width: AvidTokens.space3),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  (tx.note != null && tx.note!.isNotEmpty)
-                      ? tx.note!
-                      : 'Transaction',
-                  style: AvidTokens.labelLarge,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(_formatTime(tx.date), style: AvidTokens.bodySmall),
-              ],
+            const SizedBox(width: AvidTokens.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    (tx.note != null && tx.note!.isNotEmpty)
+                        ? tx.note!
+                        : 'Transaction',
+                    style: AvidTokens.labelLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(_formatTime(tx.date), style: AvidTokens.bodySmall),
+                ],
+              ),
             ),
-          ),
-          Text(
-            '$amountPrefix${tx.amount.toStringAsFixed(2)}',
-            style: AvidTokens.heading4.copyWith(color: amountColor),
-          ),
-        ],
+            Text(
+              '$amountPrefix${tx.amount.toStringAsFixed(2)}',
+              style: AvidTokens.heading4.copyWith(color: amountColor),
+            ),
+          ],
+        ),
       ),
     );
   }
