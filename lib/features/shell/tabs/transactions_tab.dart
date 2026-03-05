@@ -263,15 +263,17 @@ class _TransactionsTabState extends State<TransactionsTab> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              netText,
+                              cumulativeText,
                               style: AvidTokens.heading4.copyWith(
-                                color: netColor,
+                                color: isPositiveBalance
+                                    ? AvidTokens.accentSuccess
+                                    : AvidTokens.textPrimary,
                               ),
                             ),
                             Text(
-                              'Balance relativo: $cumulativeText',
+                              netText,
                               style: AvidTokens.labelSmall.copyWith(
-                                color: AvidTokens.textTertiary,
+                                color: netColor,
                               ),
                             ),
                           ],
