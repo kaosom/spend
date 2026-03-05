@@ -70,6 +70,18 @@ dev_dependencies:
   # Linting
   flutter_lints: ^6.0.0
 
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: false
+  ios: true
+  image_path: "src/logo/logo.png"
+  web:
+    generate: true
+    image_path: "src/logo/logo.png"
+    background_color: "#ffffff"
+    theme_color: "#ffffff"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
