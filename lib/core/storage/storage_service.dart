@@ -218,6 +218,70 @@ class StorageService {
     }
   }
 
+  /// Export all unencrypted data to a JSON string
+  static Future<Result<String>> exportAllData() async {
+    try {
+      if (_prefs == null) {
+        return Result.failure(
+          StorageReadError(message: 'Storage not initialized'),
+        );
+      }
+
+      final allData = <String, dynamic>{};
+      final keysResult = await getAllKeys();
+
+      if (keysResult.isFailure) return Result.failure(keysResult.error!);
+
+      for (final key in keysResult.data!) {
+        final valueResult = await retrieve(key);
+        if (valueResult.isSuccess && valueResult.data != null) {
+          allData[key] = valueResult.data;
+        }
+      }
+
+      return Result.success(jsonEncode(allData));
+    } catch (e, stackTrace) {
+      return Result.failure(
+        StorageReadError(
+          message: 'Failed to export data',
+          details: e.toString(),
+          stackTrace: stackTrace,
+        ),
+      );
+    }
+  }
+
+  /// Import unencrypted data JSON string, overwriting all current data
+  static Future<Result<void>> importData(String jsonData) async {
+    try {
+      if (_prefs == null) {
+        return Result.failure(
+          StorageWriteError(message: 'Storage not initialized'),
+        );
+      }
+
+      final decoded = jsonDecode(jsonData) as Map<String, dynamic>;
+
+      // Clear existing records before importing
+      await clearAll();
+
+      // Store imported keys normally (which will encrypt them)
+      for (final entry in decoded.entries) {
+        await store(entry.key, entry.value as Map<String, dynamic>);
+      }
+
+      return const Result.success(null);
+    } catch (e, stackTrace) {
+      return Result.failure(
+        StorageWriteError(
+          message: 'Failed to import data. Invalid format or corruption.',
+          details: e.toString(),
+          stackTrace: stackTrace,
+        ),
+      );
+    }
+  }
+
   /// Close database connection (No-op for SharedPreferences)
   static Future<Result<void>> close() async {
     return const Result.success(null);

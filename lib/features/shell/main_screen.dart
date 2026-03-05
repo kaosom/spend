@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../app/theme/tokens.dart';
 import 'tabs/insights_tab.dart';
+import 'tabs/transactions_tab.dart';
+import 'tabs/profile_tab.dart';
 import '../../design_system/organisms/add_transaction_sheet.dart';
 
 class MainScreen extends StatefulWidget {
@@ -17,10 +19,8 @@ class _MainScreenState extends State<MainScreen> {
     const Center(child: Text('Inicio Content')), // Placeholder for "Home"
     const InsightsTab(), // The new "Insights" screen
     const SizedBox.shrink(), // Placeholder for FAB
-    const Center(
-      child: Text('Transacciones'),
-    ), // Placeholder for "Transactions"
-    const Center(child: Text('Perfil')), // Placeholder for "Profile"
+    const TransactionsTab(), // The new "Transactions" screen
+    const ProfileTab(), // The new "Profile" screen
   ];
 
   @override
